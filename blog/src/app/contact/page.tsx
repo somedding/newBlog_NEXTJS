@@ -2,6 +2,31 @@
 
 import { useState } from 'react';
 import { FaGithub, FaEnvelope, FaPhone, FaInstagram, FaDiscord, FaLinkedin } from 'react-icons/fa';
+import Image from 'next/image';
+import { 
+  SiJavascript, 
+  SiTypescript, 
+  SiReact, 
+  SiNextdotjs,
+  SiNodedotjs,
+  SiTailwindcss,
+  SiGit,
+  SiC,
+  SiRust
+} from 'react-icons/si';
+
+// 기술 스택 데이터 정의
+const techStack = [
+  { name: 'JavaScript', icon: SiJavascript, color: '#F7DF1E' },
+  { name: 'TypeScript', icon: SiTypescript, color: '#3178C6' },
+  { name: 'React', icon: SiReact, color: '#61DAFB' },
+  { name: 'Next.js', icon: SiNextdotjs, color: '#000000' },
+  { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
+  { name: 'TailwindCSS', icon: SiTailwindcss, color: '#06B6D4' },
+  { name: 'Git', icon: SiGit, color: '#F05032' },
+  { name: 'C', icon: SiC, color: '#A8B9CC' },
+  { name: 'Rust', icon: SiRust, color: '#000000' }
+];
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -50,48 +75,85 @@ export default function ContactPage() {
     <div className="container mx-auto px-4 py-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-8 text-base-content">연락처</h1>
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <FaEnvelope className="w-5 h-5 text-base-content/70" />
-                <a href="mailto:your.email@example.com" className="text-primary hover:underline">
-                  your.email@example.com
-                </a>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <FaPhone className="w-5 h-5 text-base-content/70" />
-                <span className="text-base-content">010-1234-5678</span>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <FaGithub className="w-5 h-5 text-base-content/70" />
-                <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  GitHub
-                </a>
-              </div>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="card bg-base-100 shadow-xl flex-1">
+            <div className="card-body">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <FaEnvelope className="w-5 h-5 text-base-content/70" />
+                  <a href="mailto:your.email@example.com" className="text-base-content hover:text-base-content/80 no-underline">
+                    tycoontom42@gmail.com
+                  </a>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <FaPhone className="w-5 h-5 text-base-content/70" />
+                  <span className="text-base-content">010-3086-3082</span>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <FaGithub className="w-5 h-5 text-base-content/70" />
+                  <a href="https://github.com/somedding" target="_blank" rel="noopener noreferrer" className="text-base-content hover:text-base-content/80 no-underline">
+                    GitHub
+                  </a>
+                </div>
 
-              <div className="flex items-center space-x-3">
-                <FaInstagram className="w-5 h-5 text-base-content/70" />
-                <a href="https://instagram.com/yourusername" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Instagram
-                </a>
-              </div>
+                <div className="flex items-center space-x-3">
+                  <FaInstagram className="w-5 h-5 text-base-content/70" />
+                  <a href="https://www.instagram.com/_somedding_/" target="_blank" rel="noopener noreferrer" className="text-base-content hover:text-base-content/80 no-underline">
+                    Instagram
+                  </a>
+                </div>
 
-              <div className="flex items-center space-x-3">
-                <FaDiscord className="w-5 h-5 text-base-content/70" />
-                <a href="https://discord.gg/yourinvite" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Discord
-                </a>
-              </div>
+                <div className="flex items-center space-x-3">
+                  <FaDiscord className="w-5 h-5 text-base-content/70" />
+                  <a href="https://discord.gg/u8vqVCnheS" target="_blank" rel="noopener noreferrer" className="text-base-content hover:text-base-content/80 no-underline">
+                    Discord
+                  </a>
+                </div>
 
-              <div className="flex items-center space-x-3">
-                <FaLinkedin className="w-5 h-5 text-base-content/70" />
-                <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  LinkedIn
-                </a>
+                <div className="flex items-center space-x-3">
+                  <FaLinkedin className="w-5 h-5 text-base-content/70" />
+                  <a href="https://linkedin.com/in/somedding" target="_blank" rel="noopener noreferrer" className="text-base-content hover:text-base-content/80 no-underline">
+                    LinkedIn
+                  </a>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl flex-1">
+            <div className="card-body">
+              <h2 className="card-title text-base-content mb-4">기술 스택</h2>
+              <div className="flex flex-wrap gap-3">
+                {techStack.map((tech) => (
+                  <div 
+                    key={tech.name} 
+                    className="flex items-center gap-2 badge badge-lg p-4 font-medium hover:shadow-md transition-shadow"
+                    style={{ backgroundColor: `${tech.color}20` }}
+                  >
+                    <tech.icon 
+                      className="text-xl"
+                      style={{ color: tech.color }}
+                    />
+                    <span className="text-base-content">{tech.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl lg:w-96">
+            <div className="card-body items-center text-center">
+              <Image
+                src="/profile.png"
+                alt="Profile"
+                width={300}
+                height={300}
+                className="rounded-xl"
+              />
+              <h2 className="card-title mt-4 text-primary font-bold text-2xl">썸딩</h2>
+              <p className="text-base-content/70">프론트엔드 개발자</p>
             </div>
           </div>
         </div>
