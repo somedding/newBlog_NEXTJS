@@ -34,43 +34,43 @@ export default async function Home() {
     const files = (await getFiles()).slice(0, 5);
   
     return (
-      <div className="container mx-auto p-2 sm:p-4 space-y-6 sm:space-y-8">
+      <div className="container p-2 mx-auto space-y-6 sm:p-4 sm:space-y-8">
         {/* 프로필 섹션 */}
-        <div className="hero bg-base-200 rounded-box p-2 sm:p-4">
-          <div className="hero-content flex-col lg:flex-row gap-4">
+        <div className="p-2 hero bg-base-200 rounded-box sm:p-4">
+          <div className="flex-col gap-4 hero-content lg:flex-row">
             <Image
               src="/profile.png"
               alt="Profile"
               width={150}
               height={150}
-              className="mask mask-squircle shadow-2xl w-32 h-32 sm:w-48 sm:h-48"
+              className="w-32 h-32 shadow-2xl mask mask-squircle sm:w-48 sm:h-48"
             />
             <div className="text-center lg:text-left">
-              <h1 className="text-2xl sm:text-4xl font-bold text-base-content">안녕하세요!</h1>
+              <h1 className="text-2xl font-bold sm:text-4xl text-base-content">안녕하세요!</h1>
               <p className="py-2 text-base sm:text-lg text-base-content">
-                프론트엔드 개발자 <span className="text-primary font-bold">썸딩</span> 입니다. 
+                프론트엔드 개발자 <span className="font-bold text-primary">썸딩</span> 입니다. 
               </p>
-              <Link href="/about" className="text-primary text-sm sm:text-base">더 알아보기</Link>
+              <Link href="/about" className="text-sm text-primary sm:text-base">더 알아보기</Link>
             </div>
           </div>
         </div>
   
         {/* 최근 포스트 섹션 */}
         <div className="space-y-3 sm:space-y-4">
-          <div className="flex justify-between items-center px-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-base-content">최근 포스트</h2>
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-2xl font-bold sm:text-3xl text-base-content">최근 포스트</h2>
             <Link href="/posts" className="btn btn-ghost btn-sm sm:btn-md text-primary">
               모든 포스트 보기 →
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 sm:gap-4">
             {posts.map((post) => (
-              <div key={post.slug} className="card bg-base-100 shadow-xl">
-                <div className="card-body p-4 sm:p-6">
-                  <h2 className="card-title text-base sm:text-lg text-base-content">{post.title}</h2>
+              <div key={post.slug} className="shadow-xl card bg-base-100">
+                <div className="p-4 card-body sm:p-6">
+                  <h2 className="text-base card-title sm:text-lg text-base-content">{post.title}</h2>
                   <p className="text-xs sm:text-sm text-base-content/80">{post.date}</p>
                   <p className="text-sm sm:text-base text-base-content line-clamp-2">{post.description}</p>
-                  <div className="card-actions justify-end">
+                  <div className="justify-end card-actions">
                     <Link href={`/posts/${post.slug}`} className="btn btn-primary btn-sm">
                       읽기
                     </Link>
@@ -83,22 +83,22 @@ export default async function Home() {
   
         {/* 공유 파일 섹션 */}
         <div className="space-y-3 sm:space-y-4">
-          <div className="flex justify-between items-center px-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-base-content">공유 파일</h2>
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-2xl font-bold sm:text-3xl text-base-content">공유 파일</h2>
             <Link href="/resources" className="btn btn-ghost btn-sm sm:btn-md text-primary">
               모든 파일 보기 →
             </Link>
           </div>
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-2 sm:p-6">
-              <div className="overflow-x-auto -mx-2 sm:mx-0">
+          <div className="shadow-xl card bg-base-100">
+            <div className="p-2 card-body sm:p-6">
+              <div className="-mx-2 overflow-x-auto sm:mx-0">
                 {files.length > 0 ? (
-                  <table className="table table-zebra w-full text-sm sm:text-base">
+                  <table className="table w-full text-sm table-zebra sm:text-base">
                     <thead>
                       <tr>
                         <th className="text-base-content">파일명</th>
-                        <th className="text-base-content hidden sm:table-cell">크기</th>
-                        <th className="text-base-content hidden sm:table-cell">수정일</th>
+                        <th className="hidden text-base-content sm:table-cell">크기</th>
+                        <th className="hidden text-base-content sm:table-cell">수정일</th>
                         <th className="text-base-content">다운로드</th>
                       </tr>
                     </thead>
@@ -113,8 +113,8 @@ export default async function Home() {
                               <span className="truncate max-w-[120px] sm:max-w-none">{file.name}</span>
                             </div>
                           </td>
-                          <td className="text-base-content/70 hidden sm:table-cell">{formatFileSize(file.size)}</td>
-                          <td className="text-base-content/70 hidden sm:table-cell">{formatDate(file.updatedAt)}</td>
+                          <td className="hidden text-base-content/70 sm:table-cell">{formatFileSize(file.size)}</td>
+                          <td className="hidden text-base-content/70 sm:table-cell">{formatDate(file.updatedAt)}</td>
                           <td>
                             <a
                               href={file.url}
@@ -122,7 +122,7 @@ export default async function Home() {
                               className="btn btn-primary btn-xs sm:btn-sm"
                             >
                               <svg 
-                                className="w-3 h-3 sm:w-4 sm:h-4 mr-1" 
+                                className="w-3 h-3 mr-1 sm:w-4 sm:h-4" 
                                 fill="none" 
                                 stroke="currentColor" 
                                 viewBox="0 0 24 24"
@@ -142,8 +142,8 @@ export default async function Home() {
                     </tbody>
                   </table>
                 ) : (
-                  <div className="text-center py-6 sm:py-8">
-                    <p className="text-base-content/50 text-sm sm:text-base">공유된 파일이 없습니다.</p>
+                  <div className="py-6 text-center sm:py-8">
+                    <p className="text-sm text-base-content/50 sm:text-base">공유된 파일이 없습니다.</p>
                   </div>
                 )}
               </div>
@@ -153,16 +153,16 @@ export default async function Home() {
   
         {/* 기술 스택 섹션 */}
         <div className="space-y-3 sm:space-y-4">
-          <div className="flex justify-between items-center px-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-base-content">기술 스택</h2>
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-2xl font-bold sm:text-3xl text-base-content">기술 스택</h2>
           </div>
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-3 sm:p-6">
+          <div className="shadow-xl card bg-base-100">
+            <div className="p-3 card-body sm:p-6">
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {techStack.map((tech) => (
                   <div 
                     key={tech.name} 
-                    className="flex items-center gap-1 sm:gap-2 badge badge-lg p-3 sm:p-4 font-medium hover:shadow-md transition-shadow text-xs sm:text-sm"
+                    className="flex items-center gap-1 p-3 text-xs font-medium transition-shadow sm:gap-2 badge badge-lg sm:p-4 hover:shadow-md sm:text-sm"
                     style={{ backgroundColor: `${tech.color}20` }}
                   >
                     <tech.icon 
