@@ -12,13 +12,15 @@ import {
   SiTailwindcss,
   SiGit,
   SiC,
-  SiRust
+  SiRust,
+  SiPython
 } from 'react-icons/si';
 
 // 기술 스택 데이터 정의
 const techStack = [
   { name: 'JavaScript', icon: SiJavascript, color: '#F7DF1E' },
   { name: 'TypeScript', icon: SiTypescript, color: '#3178C6' },
+  { name: 'Python', icon: SiPython, color: '#3776AB' },
   { name: 'React', icon: SiReact, color: '#61DAFB' },
   { name: 'Next.js', icon: SiNextdotjs, color: '#000000' },
   { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
