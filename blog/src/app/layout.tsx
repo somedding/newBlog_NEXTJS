@@ -31,6 +31,7 @@ export default function RootLayout({
         <main className="flex-1 bg-base-100">
           {children}
         </main>
+        <Analytics />
         <Footer />
       </body>
     </html>
