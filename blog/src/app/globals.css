@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Syntax highlighting */
+[data-rehype-pretty-code-fragment] {
+  @apply overflow-hidden rounded-lg border border-base-300 my-4;
+}
+
+[data-rehype-pretty-code-fragment] pre {
+  @apply overflow-x-auto py-4 bg-base-200/50;
+}
+
+[data-rehype-pretty-code-fragment] code {
+  @apply grid min-w-full break-words rounded-none border-0 p-0;
+  counter-reset: line;
+  box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  @apply border-l-2 border-l-transparent px-4 py-0.5;
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply border-l-primary bg-primary/10;
+}
+
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply rounded-md bg-primary/10 border-primary/10 p-1;
+}
+
+/* Line numbers */
+[data-rehype-pretty-code-fragment] .line::before {
+  @apply text-base-content/40 mr-4 inline-block w-4 text-right;
+  counter-increment: line;
+  content: counter(line);
+}
+
+/* Code block title */
+[data-rehype-pretty-code-title] {
+  @apply rounded-t-lg border-b border-base-300 bg-base-300 px-4 py-2 font-mono text-sm text-base-content;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply mt-0 rounded-t-none;
+}
+
+/* Inline code */
+:not(pre) > code {
+  @apply rounded bg-base-200 px-1.5 py-0.5 text-base-content text-sm font-mono;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Pretendard', sans-serif;
+}
