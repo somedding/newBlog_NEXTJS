@@ -45,10 +45,10 @@ export default async function Home() {
             />
             <div>
               <h1 className="text-4xl font-bold text-base-content">안녕하세요!</h1>
-              <p className="py-6 text-base-content text-lg">
-                프론트엔드 개발자 [이름]입니다. 
+              <p className="py-2 text-base-content text-lg">
+                프론트엔드 개발자 <span className="text-primary font-bold">썸딩</span> 입니다. 
               </p>
-              <Link href="/about" className="btn btn-primary">더 알아보기</Link>
+              <Link href="/about" className="text-primary">더 알아보기</Link>
             </div>
           </div>
         </div>
