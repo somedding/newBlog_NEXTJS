@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" data-theme="light">
+    <html lang="ko">
       <body className={inter.className}>
         <Navigation />
         <main className="flex-1 bg-base-100">
