@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
-  eslint: {
-    // 빌드 시 ESLint 오류를 무시하고 진행하도록 설정
-    ignoreDuringBuilds: true,
-  }
+  // distDir 설정 제거 (기본값인 .next 사용)
+  output: 'standalone', // Vercel 배포를 위한 output 설정
 }
 
 module.exports = nextConfig

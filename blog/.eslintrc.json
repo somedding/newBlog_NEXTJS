@@ -1,6 +1,10 @@
 {
+<<<<<<< HEAD
   "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off"
   }
+=======
+  "extends": ["next/core-web-vitals", "next/typescript"]
+>>>>>>> parent of d42fc66 (2)
 }
