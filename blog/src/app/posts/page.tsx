@@ -4,10 +4,19 @@ import matter from 'gray-matter';
 import Link from 'next/link';
 import fs from 'fs/promises';
 
+const POSTS_PER_PAGE = 9;
+
 async function getPosts() {
-  const postsDirectory = path.join(process.cwd(), 'content', 'posts');
+  const postsDirectory = path.join(process.cwd(), 'public', 'posts');
   
   try {
+    // 디렉토리가 없으면 생성
+    try {
+      await fs.mkdir(postsDirectory, { recursive: true });
+    } catch (error) {
+      console.error('Error creating directory:', error);
+    }
+
     const files = await readdir(postsDirectory);
     const posts = await Promise.all(
       files
@@ -24,17 +33,49 @@ async function getPosts() {
         })
     );
 
-    return posts;
+    // 날짜를 기준으로 정렬 (최신순)
+    return posts.sort((a, b) => {
+      const dateA = new Date(a.frontmatter.date);
+      const dateB = new Date(b.frontmatter.date);
+      return dateB.getTime() - dateA.getTime();
+    });
+
   } catch (error) {
     console.error('Error loading posts:', error);
     return [];
   }
 }
 
-export default async function PostsPage() {
-  const posts = await getPosts();
+export default async function PostsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string }
+}) {
+  const currentPage = Number(searchParams.page) || 1;
+  const allPosts = await getPosts();
 
-  if (posts.length === 0) {
+  const totalPosts = allPosts.length;
+  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+  
+  const posts = allPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
+
+  if (posts.length === 0 && totalPosts > 0) {
+    // 페이지가 범위를 벗어났을 때
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold text-error">Page not found</h1>
+        <p className="mt-4 text-base-content/70">This page does not exist.</p>
+        <Link href="/posts" className="btn btn-primary mt-8">
+          Go to first page
+        </Link>
+      </div>
+    );
+  }
+
+  if (totalPosts === 0) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold text-base-content">No posts found</h1>
@@ -69,6 +110,41 @@ export default async function PostsPage() {
           </div>
         ))}
       </div>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-8">
+          {currentPage > 1 && (
+            <Link
+              href={`/posts?page=${currentPage - 1}`}
+              className="btn btn-ghost"
+            >
+              ←
+            </Link>
+          )}
+          
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <Link
+                key={pageNum}
+                href={`/posts?page=${pageNum}`}
+                className={`btn join-item ${pageNum === currentPage ? 'btn-active' : ''}`}
+              >
+                {pageNum}
+              </Link>
+            ))}
+          </div>
+
+          {currentPage < totalPages && (
+            <Link
+              href={`/posts?page=${currentPage + 1}`}
+              className="btn btn-ghost"
+            >
+              →
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }

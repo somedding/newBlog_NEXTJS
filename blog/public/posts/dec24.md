@@ -1,20 +1,10 @@
 ---
-title: '2024년 12월 공부 로그'
+title: '2024년 12월 5일'
 date: '2024-12-05'
 description: '2024년 12월 공부 로그'
 ---
-
 # 2024년 12월 5일
 ## 윈도우 프로그래밍 (C#)
-
-```java title="HelloWorld.java" {1,3-4}
-public class HelloWorld {
-    public static void main(String[] args) {
-        // 이 줄은 하이라이트 됩니다
-        System.out.println("Hello World");
-    }
-}
-```  
 
 ### Linq(Language Integrated Query)
 - 컬렉션 형태의 데이터를 쉽게 다루고자, SQL을 본따서 만든 구문
