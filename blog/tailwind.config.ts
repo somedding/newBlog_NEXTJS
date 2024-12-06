@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Pretendard', 'sans-serif'],
+        jalnan: ['yg-jalnan', 'sans-serif'],
       },
     },
   },

@@ -1,16 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import ThemeToggle from '../ThemeToggle';
 
 export default function Navigation() {
-  const pathname = usePathname();
-
-  const isActive = (path: string) => {
-    return pathname === path ? 'active' : '';
-  };
-
   return (
     <div className="navbar bg-base-100 shadow-lg">
       <div className="navbar-start">
@@ -21,20 +15,29 @@ export default function Navigation() {
             </svg>
           </div>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link href="/posts" className={isActive('/posts')}>포스트</Link></li>
-            <li><Link href="/about" className={isActive('/about')}>자기소개</Link></li>
-            <li><Link href="/resources" className={isActive('/resources')}>공유파일</Link></li>
-            <li><Link href="/contact" className={isActive('/contact')}>연락처</Link></li>
+            <li><Link href="/posts">포스트</Link></li>
+            <li><Link href="/about">자기소개</Link></li>
+            <li><Link href="/resources">공유파일</Link></li>
+            <li><Link href="/contact">연락처</Link></li>
           </ul>
         </div>
-        <Link href="/" className="btn btn-ghost text-xl">Blog</Link>
+        <Link href="/" className="flex items-center gap-0 text-xl px-9 py-2">
+          <Image
+            src="/profile.png"
+            alt="Profile"
+            width={55}
+            height={55}
+            className="rounded-full"
+          />
+          <span className="font-bold font-jalnan">썸딩의 테크 블로그</span>
+        </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <li><Link href="/posts" className={isActive('/posts')}>포스트</Link></li>
-          <li><Link href="/about" className={isActive('/about')}>자기소개</Link></li>
-          <li><Link href="/resources" className={isActive('/resources')}>공유파일</Link></li>
-          <li><Link href="/contact" className={isActive('/contact')}>연락처</Link></li>
+          <li><Link href="/posts">포스트</Link></li>
+          <li><Link href="/about">자기소개</Link></li>
+          <li><Link href="/resources">공유파일</Link></li>
+          <li><Link href="/contact">연락처</Link></li>
         </ul>
       </div>
       <div className="navbar-end">
