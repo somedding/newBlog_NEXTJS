@@ -18,11 +18,25 @@ const createTransporter = () => {
 
 export async function POST(req: Request) {
   try {
+    // 환경변수 로깅 추가 (실제 배포 시에는 제거하세요)
+    console.log('Environment variables check:', {
+      hasEmailUser: !!process.env.EMAIL_USER,
+      hasEmailPassword: !!process.env.EMAIL_PASSWORD,
+      hasEmailTo: !!process.env.EMAIL_TO,
+    });
+
     // 환경변수 확인
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD || !process.env.EMAIL_TO) {
       console.error('Missing environment variables');
       return NextResponse.json(
-        { error: '서버 설정 오류가 발생했습니다.' },
+        { 
+          error: '서버 설정 오류가 발생했습니다.',
+          missing: {
+            EMAIL_USER: !process.env.EMAIL_USER,
+            EMAIL_PASSWORD: !process.env.EMAIL_PASSWORD,
+            EMAIL_TO: !process.env.EMAIL_TO,
+          }
+        },
         { status: 500 }
       );
     }
@@ -72,11 +86,15 @@ export async function POST(req: Request) {
       messageId: info.messageId 
     });
   } catch (error) {
-    console.error('Detailed error:', error);
+    console.error('Detailed error:', {
+      message: error instanceof Error ? error.message : '알 수 없는 오류',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    
     return NextResponse.json(
       { 
         error: '메일 전송에 실패했습니다.', 
-        details: error instanceof Error ? error.message : '알 수 없는 오류'
+        details: error instanceof Error ? error.message : '알 수 없는 오류',
       },
       { status: 500 }
     );
