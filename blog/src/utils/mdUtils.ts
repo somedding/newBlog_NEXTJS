@@ -3,7 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { Post, PostMetadata } from '@/types/post';
 
-const postsDirectory = path.join(process.cwd(), 'content', 'posts');
+const postsDirectory = path.join(process.cwd(), 'public', 'posts');
 
 export function getAllPosts(): Post[] {
   // 디렉토리가 없으면 생성
