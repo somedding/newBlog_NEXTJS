@@ -109,7 +109,7 @@ export default function ContactPage() {
 
                 <div className="flex items-center space-x-3">
                   <FaDiscord className="w-5 h-5 text-base-content/70" />
-                  <a href="https://discord.gg/u8vqVCnheS" target="_blank" rel="noopener noreferrer" className="no-underline text-base-content hover:text-base-content/80">
+                  <a href="https://www.discordapp.com/users/526269311996657667" target="_blank" rel="noopener noreferrer" className="no-underline text-base-content hover:text-base-content/80">
                     Discord
                   </a>
                 </div>
