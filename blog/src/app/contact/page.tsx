@@ -39,7 +39,6 @@ export default function ContactPage() {
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [showCopyMessage, setShowCopyMessage] = useState({
-    phone: false,
     email: false
   });
 
@@ -77,16 +76,6 @@ export default function ContactPage() {
     }
   };
 
-  const handlePhoneClick = async () => {
-    try {
-      await navigator.clipboard.writeText('010-3086-3082');
-      setShowCopyMessage(prev => ({ ...prev, phone: true }));
-      setTimeout(() => setShowCopyMessage(prev => ({ ...prev, phone: false })), 2000);
-    } catch (err) {
-      console.error('Failed to copy phone number:', err);
-    }
-  };
-
   const handleEmailClick = async () => {
     try {
       await navigator.clipboard.writeText('tycoontom42@gmail.com');
@@ -114,21 +103,6 @@ export default function ContactPage() {
                     tycoontom42@gmail.com
                   </button>
                   {showCopyMessage.email && (
-                    <div className="absolute flex items-center justify-center px-6 py-1.5 text-sm transform -translate-x-1/2 rounded-full shadow-lg -top-8 left-1/2 bg-success/80 text-success-content backdrop-blur-sm min-w-[140px]">
-                      복사되었습니다!
-                    </div>
-                  )}
-                </div>
-
-                <div className="relative flex items-center space-x-3">
-                  <FaPhone className="w-5 h-5 text-base-content/70" />
-                  <button 
-                    onClick={handlePhoneClick}
-                    className="cursor-pointer text-base-content hover:text-base-content/80"
-                  >
-                    010-3086-3082
-                  </button>
-                  {showCopyMessage.phone && (
                     <div className="absolute flex items-center justify-center px-6 py-1.5 text-sm transform -translate-x-1/2 rounded-full shadow-lg -top-8 left-1/2 bg-success/80 text-success-content backdrop-blur-sm min-w-[140px]">
                       복사되었습니다!
                     </div>
