@@ -66,7 +66,7 @@ export default function ContactPage() {
       setFormData({ name: '', email: '', subject: '', message: '' });
       
       setTimeout(() => setStatus('idle'), 3000);
-    } catch (_error) {
+    } catch {
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }
