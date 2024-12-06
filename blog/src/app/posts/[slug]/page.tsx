@@ -2,10 +2,10 @@ import { readFile, readdir } from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
-import { markdownToHtml } from '../../lib/markdown';
+import { markdownToHtml } from '@/app/lib/markdown';
 
 export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), 'content', 'posts');
+  const postsDirectory = path.join(process.cwd(), 'public', 'posts');
   const files = await readdir(postsDirectory);
   
   return files
@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 }
 
 async function getPost(slug: string) {
-  const postsDirectory = path.join(process.cwd(), 'content', 'posts');
+  const postsDirectory = path.join(process.cwd(), 'public', 'posts');
   const filePath = path.join(postsDirectory, `${slug}.md`);
   
   try {
@@ -41,7 +41,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold text-error">Post not found</h1>
-        <p className="mt-4">The requested post could not be found.</p>
+        <p className="mt-4 text-base-content/70">The requested post could not be found.</p>
         <Link href="/posts" className="btn btn-primary mt-8">
           Back to Posts
         </Link>
@@ -61,7 +61,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
         </nav>
         
         <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">{frontmatter.title}</h1>
+          <h1 className="text-4xl font-bold mb-2 text-base-content">{frontmatter.title}</h1>
           {frontmatter.date && (
             <p className="text-base-content/70">{frontmatter.date}</p>
           )}
@@ -69,6 +69,13 @@ export default async function PostPage({ params }: { params: { slug: string } })
             <p className="text-xl text-base-content/80 mt-4">
               {frontmatter.description}
             </p>
+          )}
+          {frontmatter.tags && (
+            <div className="flex gap-2 mt-4">
+              {frontmatter.tags.map((tag: string) => (
+                <span key={tag} className="badge badge-outline">{tag}</span>
+              ))}
+            </div>
           )}
         </header>
 

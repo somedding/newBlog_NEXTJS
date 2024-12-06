@@ -27,8 +27,8 @@ module.exports = {
         },
         dark: {
           ...require("daisyui/src/theming/themes")["dark"],
-          "base-100": "#0f172a",          // 메인 배경색 (매우 어두운 네이비)
-          "base-200": "#1e293b",          // 섹션 배경색 (어두운 네이비)
+          "base-100": "#1e293b",          // 메인 배경색 (약간 밝은 네이비)
+          "base-200": "#0f172a",          // 섹션 배경색 (어두운 네이비)
           "base-300": "#334155",          // 강조 배경색
           "base-content": "#e2e8f0",      // 기본 텍스트 색상
           "primary": "#3b82f6",           // 프라이머리 색상
