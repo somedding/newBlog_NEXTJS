@@ -9,8 +9,7 @@ type Props = {
   params: {
     slug: string;
   };
-  searchParams: { [key: string]: string | string[] | undefined };
-
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateStaticParams() {
@@ -43,7 +42,7 @@ async function getPost(slug: string) {
   }
 }
 
-export default async function PostPage({ params, searchParams }: Props) {
+export default async function PostPage({ params }: Props) {
   const post = await getPost(params.slug);
   
   if (!post) {
