@@ -26,6 +26,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" data-theme="light">
+      <head>
+        <link 
+          rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" 
+          integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" 
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <Navigation />
         <main className="flex-1 bg-base-100">
