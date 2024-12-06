@@ -1,23 +1,51 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-// 이메일 전송을 위한 트랜스포터 설정
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+// 트랜스포터 설정을 함수로 분리
+const createTransporter = () => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    throw new Error('Email configuration is missing');
+  }
+
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+};
 
 export async function POST(req: Request) {
   try {
+    // 환경변수 확인
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD || !process.env.EMAIL_TO) {
+      console.error('Missing environment variables');
+      return NextResponse.json(
+        { error: '서버 설정 오류가 발생했습니다.' },
+        { status: 500 }
+      );
+    }
+
     const { name, email, subject, message } = await req.json();
 
-    console.log('Attempting to send email with:', {
+    // 요청 데이터 검증
+    if (!name || !email || !subject || !message) {
+      return NextResponse.json(
+        { error: '모든 필드를 입력해주세요.' },
+        { status: 400 }
+      );
+    }
+
+    const transporter = createTransporter();
+
+    console.log('Sending email with config:', {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_TO,
-      subject: `[Contact] ${subject}`,
+      auth: {
+        user: process.env.EMAIL_USER,
+        // 비밀번호는 로그에 출력하지 않음
+      }
     });
 
     // 이메일 옵션 설정
@@ -37,13 +65,19 @@ export async function POST(req: Request) {
 
     // 이메일 전송
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info);
+    console.log('Email sent successfully:', info.messageId);
 
-    return NextResponse.json({ message: '메일이 성공적으로 전송되었습니다.' });
+    return NextResponse.json({ 
+      message: '메일이 성공적으로 전송되었습니다.',
+      messageId: info.messageId 
+    });
   } catch (error) {
     console.error('Detailed error:', error);
     return NextResponse.json(
-      { error: '메일 전송에 실패했습니다.', details: error.message },
+      { 
+        error: '메일 전송에 실패했습니다.', 
+        details: error instanceof Error ? error.message : '알 수 없는 오류'
+      },
       { status: 500 }
     );
   }
