@@ -3,7 +3,7 @@
 vercel 에 배포중입니다.
 
 ## 블로그 주소
-https://somedding.vercel.app/  
+https://www.somedding.kr/
 
 ## 블로그 소개
 썸딩의 기술 블로그.
