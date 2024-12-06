@@ -10,7 +10,7 @@ description: '2024년 11월 공부 로그'
 
 입력 크기가 작은 부분 문제들을 해결한 후에 , 큰 크기의 부분문제 해결 후 입력 문제 해결
 
-![dp알고리즘](/24/img/image.png)
+![dp알고리즘](/img/Screenshot%202024-11-06%20at%203.40.18%20PM.png)
 
 ### 플로이드-워샬 알고리즘 Floyd - Warshall
 시간 복잡도 : O($n^3$)   
@@ -20,7 +20,7 @@ description: '2024년 11월 공부 로그'
 
 오른쪽 삽입 연산  
 아래쪽 삭제 연산
-![dp알고리즘](/24/img/Screenshot%202024-11-06%20at%203.40.18 PM.png)
+![dp알고리즘](/img/Screenshot%202024-11-06%20at%203.40.18%20PM.png)
 - $E[i, j]$ 의 값 공식  
     - $E[i,j] = min \to { E[i, j-1]+1, E[i-1, j]+1, E[i-1, j-1]+\alpha}$
 

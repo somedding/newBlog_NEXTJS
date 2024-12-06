@@ -2,17 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 마크다운 헤딩 스타일 */
+@layer base {
+  .prose h1 {
+    @apply mt-8 mb-4 text-2xl font-bold text-base-content;
+  }
+  .prose h2 {
+    @apply mt-6 mb-3 text-xl font-bold text-base-content;
+  }
+  .prose h3 {
+    @apply mt-4 mb-2 text-lg font-bold text-base-content;
+  }
+  .prose h4 {
+    @apply mt-3 mb-2 text-base font-bold text-base-content;
+  }
+  .prose h5 {
+    @apply mt-2 mb-1 text-sm font-bold text-base-content;
+  }
+  .prose h6 {
+    @apply mt-2 mb-1 text-sm font-semibold text-base-content;
+  }
+}
+
 /* Syntax highlighting */
 [data-rehype-pretty-code-fragment] {
-  @apply overflow-hidden rounded-lg border border-base-300 my-4;
+  @apply relative my-4 overflow-hidden border rounded-lg border-base-300;
 }
 
 [data-rehype-pretty-code-fragment] pre {
-  @apply overflow-x-auto py-4 bg-base-200/50;
+  @apply py-4 overflow-x-auto bg-base-200/50;
 }
 
 [data-rehype-pretty-code-fragment] code {
-  @apply grid min-w-full break-words rounded-none border-0 p-0;
+  @apply grid min-w-full p-0 break-words border-0 rounded-none;
   counter-reset: line;
   box-decoration-break: clone;
 }
@@ -26,19 +48,19 @@
 }
 
 [data-rehype-pretty-code-fragment] .word--highlighted {
-  @apply rounded-md bg-primary/10 border-primary/10 p-1;
+  @apply p-1 rounded-md bg-primary/10 border-primary/10;
 }
 
 /* Line numbers */
 [data-rehype-pretty-code-fragment] .line::before {
-  @apply text-base-content/40 mr-4 inline-block w-4 text-right;
+  @apply inline-block w-4 mr-4 text-right text-base-content/40;
   counter-increment: line;
   content: counter(line);
 }
 
 /* Code block title */
 [data-rehype-pretty-code-title] {
-  @apply rounded-t-lg border-b border-base-300 bg-base-300 px-4 py-2 font-mono text-sm text-base-content;
+  @apply flex items-center justify-between px-4 py-2 font-mono text-sm border-b rounded-t-lg border-base-300 bg-base-300 text-base-content;
 }
 
 [data-rehype-pretty-code-title] + pre {
@@ -80,4 +102,14 @@
 
 body {
   font-family: 'Pretendard', sans-serif;
+}
+
+/* 코드 블록 컨테이너 */
+[data-rehype-pretty-code-fragment] {
+  @apply relative;
+}
+
+/* 코드 블록 제목 */
+[data-rehype-pretty-code-title] {
+  @apply flex items-center justify-between;
 }
