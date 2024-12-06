@@ -65,9 +65,8 @@ export default function ContactPage() {
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       
-      // 3초 후 상태 초기화
       setTimeout(() => setStatus('idle'), 3000);
-    } catch (error) {
+    } catch (_error) {
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }
