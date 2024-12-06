@@ -1,19 +1,22 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
   useEffect(() => {
     // 초기 테마 설정
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    setTheme(savedTheme as 'light' | 'dark');
   }, []);
 
   const toggleTheme = () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    const newTheme = theme === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+    setTheme(newTheme);
   };
 
   return (
@@ -21,8 +24,7 @@ export default function ThemeToggle() {
       <input
         type="checkbox"
         onChange={toggleTheme}
-        className="theme-controller"
-        value="dark"
+        checked={theme === 'dark'}
       />
       {/* 해 아이콘 */}
       <svg className="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
