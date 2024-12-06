@@ -65,8 +65,13 @@ export default function ContactPage() {
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       
+      // 3초 후 상태 초기화
       setTimeout(() => setStatus('idle'), 3000);
+<<<<<<< HEAD
     } catch {
+=======
+    } catch (error) {
+>>>>>>> parent of d42fc66 (2)
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }

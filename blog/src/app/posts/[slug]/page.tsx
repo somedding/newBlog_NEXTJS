@@ -4,11 +4,14 @@ import matter from 'gray-matter';
 import Link from 'next/link';
 import { markdownToHtml } from '@/app/lib/markdown';
 
-interface PageProps {
+// Props 타입 정의
+type Props = {
   params: {
     slug: string;
   };
-}
+  searchParams: { [key: string]: string | string[] | undefined };
+
+};
 
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'public', 'posts');
@@ -40,7 +43,7 @@ async function getPost(slug: string) {
   }
 }
 
-export default async function PostPage({ params }: PageProps) {
+export default async function PostPage({ params, searchParams }: Props) {
   const post = await getPost(params.slug);
   
   if (!post) {
@@ -92,4 +95,5 @@ export default async function PostPage({ params }: PageProps) {
       </div>
     </article>
   );
+}
 }
