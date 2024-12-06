@@ -7,9 +7,9 @@ import ThemeToggle from '../ThemeToggle';
 export default function Navigation() {
   return (
     <div className="navbar bg-base-100 shadow-lg">
-      <div className="navbar-start">
+      <div className="navbar-start flex-1">
         <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-sm lg:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
             </svg>
@@ -21,15 +21,15 @@ export default function Navigation() {
             <li><Link href="/contact">연락처</Link></li>
           </ul>
         </div>
-        <Link href="/" className="flex items-center gap-0 text-xl px-9 py-2">
+        <Link href="/" className="flex items-center gap-0 px-1 sm:px-4 py-2 min-w-0 flex-1">
           <Image
             src="/profile.png"
             alt="Profile"
-            width={55}
-            height={55}
-            className="rounded-full"
+            width={45}
+            height={45}
+            className="rounded-full w-[30px] h-[30px] sm:w-[45px] sm:h-[45px] flex-shrink-0"
           />
-          <span className="font-bold font-jalnan">썸딩의 테크 블로그</span>
+          <span className="font-bold font-jalnan text-xs sm:text-xl ml-2 truncate">썸딩의 테크 블로그</span>
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
@@ -40,7 +40,7 @@ export default function Navigation() {
           <li><Link href="/contact">연락처</Link></li>
         </ul>
       </div>
-      <div className="navbar-end">
+      <div className="navbar-end w-auto">
         <ThemeToggle />
       </div>
     </div>
