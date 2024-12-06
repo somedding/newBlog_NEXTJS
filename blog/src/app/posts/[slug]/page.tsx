@@ -96,4 +96,3 @@ export default async function PostPage({ params, searchParams }: Props) {
     </article>
   );
 }
-}
