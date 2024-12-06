@@ -4,14 +4,16 @@ import matter from 'gray-matter';
 import Link from 'next/link';
 import { markdownToHtml } from '@/app/lib/markdown';
 
-// Props 타입을 Next.js 13+ 버전에 맞게 수정
-interface PageProps {
-  params: {
-    slug: string;
-  };
+// Next.js 13+ 타입 정의
+type PageParams = {
+  slug: string;
 }
 
-export async function generateStaticParams() {
+type Props = {
+  params: PageParams;
+}
+
+export async function generateStaticParams(): Promise<PageParams[]> {
   const postsDirectory = path.join(process.cwd(), 'public', 'posts');
   const files = await readdir(postsDirectory);
   
@@ -41,8 +43,7 @@ async function getPost(slug: string) {
   }
 }
 
-// PageProps 타입을 사용하도록 수정
-export default async function PostPage({ params }: PageProps) {
+export default async function PostPage({ params }: Props) {
   const post = await getPost(params.slug);
   
   if (!post) {
