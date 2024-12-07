@@ -26,50 +26,60 @@
 
 /* Syntax highlighting */
 [data-rehype-pretty-code-fragment] {
-  @apply relative my-4 overflow-hidden border rounded-lg border-base-300 shadow-lg;
+  @apply relative my-4 overflow-hidden rounded-lg border-0 bg-[#1e1e1e] shadow-xl;
+}
+
+/* 코드 블록 헤더 */
+[data-rehype-pretty-code-title] {
+  @apply flex items-center gap-2 bg-[#2d2d2d] px-4 py-3 font-mono text-sm text-gray-200;
+}
+
+/* 상단 원형 버튼들 */
+[data-rehype-pretty-code-title]::before {
+  content: '';
+  @apply h-3 w-3 rounded-full bg-[#ff5f56];
+  box-shadow: 1.4em 0 0 #ffbd2e, 2.8em 0 0 #27c93f;
 }
 
 [data-rehype-pretty-code-fragment] pre {
-  @apply py-4 overflow-x-auto bg-base-200;
+  @apply overflow-x-auto py-4;
 }
 
 [data-rehype-pretty-code-fragment] code {
-  @apply grid min-w-full p-0 break-words border-0 rounded-none font-medium text-base-content;
+  @apply grid min-w-full break-words border-0 bg-transparent p-0 text-sm text-gray-200;
   counter-reset: line;
   box-decoration-break: clone;
 }
 
-[data-rehype-pretty-code-fragment] .line {
-  @apply border-l-2 border-l-transparent px-4 py-0.5 text-base-content;
-}
-
-[data-rehype-pretty-code-fragment] .line--highlighted {
-  @apply border-l-primary bg-primary/30 font-bold;
-}
-
-[data-rehype-pretty-code-fragment] .word--highlighted {
-  @apply p-1 rounded-md bg-primary/30 border-primary/30 font-bold;
-}
-
-/* Line numbers */
+/* 라인 번호 */
 [data-rehype-pretty-code-fragment] .line::before {
-  @apply inline-block w-4 mr-4 text-right text-base-content/70;
+  @apply mr-4 inline-block w-4 text-right text-gray-500;
   counter-increment: line;
   content: counter(line);
 }
 
-/* Code block title */
-[data-rehype-pretty-code-title] {
-  @apply flex items-center justify-between px-4 py-2 font-mono text-sm font-bold border-b rounded-t-lg border-base-300 bg-base-300 text-base-content;
+[data-rehype-pretty-code-fragment] .line {
+  @apply border-l-2 border-l-transparent px-4 py-0.5;
 }
 
+/* 하이라이트된 라인 */
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply border-l-blue-400 bg-blue-400/10;
+}
+
+/* 하이라이트된 단어 */
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply rounded-md bg-blue-400/10 border-blue-400/10 p-1;
+}
+
+/* 코드 블록 제목이 있을 때 상단 둥글게 처리 제거 */
 [data-rehype-pretty-code-title] + pre {
   @apply mt-0 rounded-t-none;
 }
 
-/* Inline code */
+/* 인라인 코드 */
 :not(pre) > code {
-  @apply rounded bg-base-200 px-1.5 py-0.5 text-base-content text-sm font-mono font-medium shadow-sm;
+  @apply rounded bg-neutral-800 px-1.5 py-0.5 text-sm font-mono text-gray-200;
 }
 
 /* 폰트 적용 */
