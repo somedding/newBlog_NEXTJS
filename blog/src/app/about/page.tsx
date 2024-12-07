@@ -2,9 +2,9 @@ import { FaHardHat, FaCog } from 'react-icons/fa';
 
 export default function AboutPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body text-center">
+    <div className="container px-4 py-8 mx-auto">
+      <div className="shadow-xl card bg-base-100">
+        <div className="text-center card-body">
           <div className="flex flex-col items-center gap-4">
             <div className="flex items-center gap-2">
               <FaHardHat className="text-4xl text-warning animate-bounce" />
@@ -16,7 +16,7 @@ export default function AboutPage() {
               더 나은 모습으로 찾아뵙겠습니다! 😊
             </p>
             
-            <div className="mt-4 p-4 bg-warning/10 rounded-lg">
+            <div className="p-4 mt-4 rounded-lg bg-warning/10">
               <p className="text-warning">
                 현재 자기소개 페이지를 열심히 준비하고 있습니다.
                 <br />
