@@ -99,16 +99,22 @@ export default async function Home() {
         pageSize: 5
       });
 
-      driveFiles = response.data.files?.map(file => ({
-        id: file.id!,
-        name: file.name!,
-        description: '',
-        size: parseInt(file.size || '0'),
-        type: file.mimeType!.split('/').pop()!,
-        url: `/api/files/${file.id}`,
-        createdAt: new Date(file.createdTime || file.modifiedTime!),
-        updatedAt: new Date(file.modifiedTime!)
-      })) || [];
+      driveFiles = response.data.files?.map(file => {
+        // 한국 시간으로 변환
+        const createdTime = new Date(file.createdTime || file.modifiedTime!);
+        const modifiedTime = new Date(file.modifiedTime!);
+        
+        return {
+          id: file.id!,
+          name: file.name!,
+          description: '',
+          size: parseInt(file.size || '0'),
+          type: file.mimeType!.split('/').pop()!,
+          url: `/api/files/${file.id}`,
+          createdAt: createdTime,
+          updatedAt: modifiedTime
+        };
+      }) || [];
     } catch (error) {
       console.error('Error fetching Google Drive files:', error);
     }
