@@ -12,3 +12,4 @@ https://www.somedding.kr/
 
 2024-12-06 최초 작성
 auth 추가
+12-07 블로그 배포
