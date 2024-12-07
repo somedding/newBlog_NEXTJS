@@ -3,16 +3,11 @@ import { NextRequest } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
-interface RouteSegment {
-  params: {
-    fileId: string;
-  };
-}
-
+// Next.js 15의 새로운 타입 정의 사용
 export async function GET(
   request: NextRequest,
-  { params }: RouteSegment
-) {
+  { params }: { params: { fileId: string } }
+): Promise<Response> {
   try {
     const { fileId } = params;
     const drive = getGoogleDriveClient();
