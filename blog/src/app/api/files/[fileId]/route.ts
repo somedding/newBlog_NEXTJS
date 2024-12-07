@@ -3,13 +3,17 @@ import { NextRequest } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
-// Next.js 15의 새로운 타입 정의 사용
+type Props = {
+  params: { fileId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { fileId: string } }
+  request: Request | NextRequest,
+  props: Props
 ): Promise<Response> {
   try {
-    const { fileId } = params;
+    const { fileId } = props.params;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
