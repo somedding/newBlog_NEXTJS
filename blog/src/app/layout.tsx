@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react"
 
-const inter = Inter({ subsets: ["latin"] });
+// 라틴 문자용 폰트
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+// 한글 폰트
+const notoSansKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-kr',
+});
 
 export const metadata: Metadata = {
   title: "썸딩의 테크 블로그",
@@ -25,15 +38,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" data-theme="light">
+    <html lang="ko" data-theme="light" className={`${inter.variable} ${notoSansKr.variable}`}>
       <head>
+        <link 
+          rel="preconnect" 
+          href="https://cdn.jsdelivr.net" 
+          crossOrigin="anonymous" 
+        />
         <link 
           rel="stylesheet" 
           href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" 
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+      <body className="min-h-screen flex flex-col">
         <Navigation />
         <main className="flex-1 bg-base-100">
           {children}

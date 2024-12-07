@@ -43,6 +43,8 @@ export default async function Home() {
               alt="Profile"
               width={150}
               height={150}
+              priority
+              sizes="(max-width: 640px) 128px, (max-width: 768px) 192px, 150px"
               className="w-32 h-32 shadow-2xl mask mask-squircle sm:w-48 sm:h-48"
             />
             <div className="text-center lg:text-left">

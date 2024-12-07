@@ -72,36 +72,14 @@
   @apply rounded bg-base-200 px-1.5 py-0.5 text-base-content text-sm font-mono;
 }
 
-@font-face {
-  font-family: 'yg-jalnan';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
-  font-weight: 700;
-  font-style: normal;
-}
-
+/* 폰트 적용 */
 body {
-  font-family: 'Pretendard', sans-serif;
+  font-family: var(--font-noto-sans-kr), var(--font-inter), system-ui, sans-serif;
+}
+
+/* 영문에 Inter 폰트 우선 적용 */
+h1, h2, h3, h4, h5, h6, button, .font-en {
+  font-family: var(--font-inter), var(--font-noto-sans-kr), system-ui, sans-serif;
 }
 
 /* 코드 블록 컨테이너 */

@@ -3,6 +3,10 @@ import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
 import fs from 'fs/promises';
+import { Suspense } from 'react';
+import PostSkeleton from '@/components/PostSkeleton';
+import ErrorState from '@/components/ErrorState';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const POSTS_PER_PAGE = 9;
 
@@ -52,99 +56,102 @@ export default async function PostsPage({
   searchParams: { page?: string }
 }) {
   const currentPage = Number(searchParams.page) || 1;
-  const allPosts = await getPosts();
-
-  const totalPosts = allPosts.length;
-  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
   
-  const posts = allPosts.slice(
-    (currentPage - 1) * POSTS_PER_PAGE,
-    currentPage * POSTS_PER_PAGE
-  );
+  try {
+    const allPosts = await getPosts();
+    const totalPosts = allPosts.length;
+    
+    if (totalPosts === 0) {
+      return (
+        <ErrorState 
+          message="포스트를 찾을 수 없습니다." 
+        />
+      );
+    }
 
-  if (posts.length === 0 && totalPosts > 0) {
-    // 페이지가 범위를 벗어났을 때
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold text-error">Page not found</h1>
-        <p className="mt-4 text-base-content/70">This page does not exist.</p>
-        <Link href="/posts" className="btn btn-primary mt-8">
-          Go to first page
-        </Link>
-      </div>
+    const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+    const posts = allPosts.slice(
+      (currentPage - 1) * POSTS_PER_PAGE,
+      currentPage * POSTS_PER_PAGE
     );
-  }
 
-  if (totalPosts === 0) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold text-base-content">No posts found</h1>
-        <p className="mt-4 text-base-content/70">Could not load blog posts.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-base-content">Blog Posts</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <div key={post.slug} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-            <div className="card-body">
-              <h2 className="card-title text-xl font-bold text-base-content">{post.frontmatter.title}</h2>
-              {post.frontmatter.date && (
-                <p className="text-sm text-base-content/70">{post.frontmatter.date}</p>
-              )}
-              <p className="text-base-content/80">
-                {post.frontmatter.description || 'No description available'}
-              </p>
-              <div className="card-actions justify-end mt-4">
-                <Link 
-                  href={`/posts/${post.slug}`} 
-                  className="btn btn-primary btn-sm"
-                >
-                  Read More
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-8">
-          {currentPage > 1 && (
-            <Link
-              href={`/posts?page=${currentPage - 1}`}
-              className="btn btn-ghost"
-            >
-              ←
-            </Link>
-          )}
-          
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Link
-                key={pageNum}
-                href={`/posts?page=${pageNum}`}
-                className={`btn join-item ${pageNum === currentPage ? 'btn-active' : ''}`}
-              >
-                {pageNum}
-              </Link>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8 text-base-content">Blog Posts</h1>
+        <Suspense fallback={
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(POSTS_PER_PAGE)].map((_, i) => (
+              <PostSkeleton key={i} />
             ))}
           </div>
+        }>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <div key={post.slug} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="card-body">
+                  <h2 className="card-title text-xl font-bold text-base-content">{post.frontmatter.title}</h2>
+                  {post.frontmatter.date && (
+                    <p className="text-sm text-base-content/70">{post.frontmatter.date}</p>
+                  )}
+                  <p className="text-base-content/80">
+                    {post.frontmatter.description || 'No description available'}
+                  </p>
+                  <div className="card-actions justify-end mt-4">
+                    <Link 
+                      href={`/posts/${post.slug}`} 
+                      className="btn btn-primary btn-sm"
+                    >
+                      Read More
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Suspense>
 
-          {currentPage < totalPages && (
-            <Link
-              href={`/posts?page=${currentPage + 1}`}
-              className="btn btn-ghost"
-            >
-              →
-            </Link>
-          )}
-        </div>
-      )}
-    </div>
-  );
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            {currentPage > 1 && (
+              <Link
+                href={`/posts?page=${currentPage - 1}`}
+                className="btn btn-ghost"
+              >
+                ←
+              </Link>
+            )}
+            
+            <div className="join">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <Link
+                  key={pageNum}
+                  href={`/posts?page=${pageNum}`}
+                  className={`btn join-item ${pageNum === currentPage ? 'btn-active' : ''}`}
+                >
+                  {pageNum}
+                </Link>
+              ))}
+            </div>
+
+            {currentPage < totalPages && (
+              <Link
+                href={`/posts?page=${currentPage + 1}`}
+                className="btn btn-ghost"
+              >
+                →
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  } catch (error) {
+    return (
+      <ErrorState 
+        message="포스트를 불러오는 중 오류가 발생했습니다." 
+        retry={() => window.location.reload()}
+      />
+    );
+  }
 }
