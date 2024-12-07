@@ -11,11 +11,19 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('ko-KR', {
+  const dateStr = new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   }).format(date);
+
+  const timeStr = new Intl.DateTimeFormat('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }).format(date);
+
+  return `${dateStr} ${timeStr}`;
 }
 
 export async function getFiles(): Promise<FileInfo[]> {

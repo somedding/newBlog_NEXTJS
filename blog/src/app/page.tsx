@@ -205,7 +205,7 @@ export default async function Home() {
                       <tr>
                         <th className="text-base-content">파일명</th>
                         <th className="hidden text-base-content sm:table-cell">크기</th>
-                        <th className="hidden text-base-content sm:table-cell">업로드일</th>
+                        <th className="hidden text-base-content sm:table-cell min-w-[180px]">업로드일</th>
                         <th className="text-base-content">다운로드</th>
                       </tr>
                     </thead>

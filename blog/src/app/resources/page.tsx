@@ -83,7 +83,7 @@ async function getAllFiles(): Promise<ExtendedFileInfo[]> {
       fields: 'files(id, name, mimeType, size, createdTime, modifiedTime)',
     });
 
-    // 구글 드라이브 파일을 FileInfo 형식으로 변환
+    // 구글 드라이브 파일을 FileInfo ��식으로 변환
     const driveFilesMapped: ExtendedFileInfo[] = driveFiles.data.files?.map(file => ({
       id: file.id!,
       name: file.name!,
@@ -125,7 +125,7 @@ export default async function ResourcesPage() {
                   <tr>
                     <th className="text-base-content">파일명</th>
                     <th className="text-base-content">크기</th>
-                    <th className="text-base-content">업로드일</th>
+                    <th className="text-base-content min-w-[180px]">업로드일</th>
                     <th className="text-base-content">다운로드</th>
                   </tr>
                 </thead>
