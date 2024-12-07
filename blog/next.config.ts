@@ -9,6 +9,21 @@ const nextConfig = {
     // ESLint 에러가 있어도 빌드 진행
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000']
+    }
+  },
+  images: {
+    domains: ['avatars.githubusercontent.com'], // GitHub 프로필 이미지를 위한 설정
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.example.com',
+        pathname: '/images/**',
+      },
+    ],
+  },
   env: {
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
@@ -17,29 +32,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
-
-module.exports = {
-  images: {
-    domains: ['example.com'], // 외부 이미지 도메인 허용
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.example.com',
-        port: '',
-        pathname: '/images/**',
-      },
-    ],
-  },
-} 
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    serverActions: true,
-  },
-  images: {
-    domains: ['avatars.githubusercontent.com'], // GitHub 프로필 이미지를 위한 설정
-  },
-};
-
-module.exports = nextConfig;
