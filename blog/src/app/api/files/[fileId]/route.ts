@@ -1,5 +1,7 @@
 import { getGoogleDriveClient, getFileMetadata } from '@/utils/googleDrive';
 import { NextRequest } from 'next/server';
+import { Readable } from 'stream';
+import { GaxiosResponse } from 'gaxios';
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +15,7 @@ export async function GET(
     const metadata = await getFileMetadata(fileId);
     
     // 파일 다운로드
-    const response = await drive.files.get(
+    const response: GaxiosResponse<Readable> = await drive.files.get(
       { fileId, alt: 'media' },
       { responseType: 'stream' }
     );
@@ -27,7 +29,8 @@ export async function GET(
     }
 
     // 스트림을 Response로 변환
-    return new Response(response.data as any, { headers });
+    const stream = response.data;
+    return new Response(stream as unknown as ReadableStream, { headers });
   } catch (error) {
     console.error('Error downloading file:', error);
     return new Response('Error downloading file', { status: 500 });
