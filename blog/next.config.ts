@@ -31,3 +31,15 @@ module.exports = {
     ],
   },
 } 
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    serverActions: true,
+  },
+  images: {
+    domains: ['avatars.githubusercontent.com'], // GitHub 프로필 이미지를 위한 설정
+  },
+};
+
+module.exports = nextConfig;
