@@ -3,15 +3,9 @@ import { NextRequest } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
-// Next.js App Router의 API route 타입 정의
-type RouteContext = {
-  params: { fileId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
 export async function GET(
-  _request: NextRequest,
-  { params }: RouteContext
+  request: NextRequest,
+  { params }: { params: { fileId: string } }
 ) {
   try {
     const { fileId } = params;
