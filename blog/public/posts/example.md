@@ -15,3 +15,9 @@ tags: ["태그1", "태그2"]
 
 ```javascript
 console 
+```
+
+# 제목
+
+일반인 마크다운 이미지 구문:
+![이미지 설명](/img/image.png)

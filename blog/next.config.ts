@@ -17,3 +17,17 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
+module.exports = {
+  images: {
+    domains: ['example.com'], // 외부 이미지 도메인 허용
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.example.com',
+        port: '',
+        pathname: '/images/**',
+      },
+    ],
+  },
+} 
