@@ -91,8 +91,8 @@ async function getAllFiles(): Promise<ExtendedFileInfo[]> {
       size: parseInt(file.size || '0'),
       type: file.mimeType!.split('/').pop()!,
       url: `/api/files/${file.id}`,
-      createdAt: new Date(file.createdTime || file.modifiedTime!),
-      updatedAt: new Date(file.modifiedTime!),
+      createdAt: new Date(new Date(file.createdTime || file.modifiedTime!).getTime() + (9 * 60 * 60 * 1000)),
+      updatedAt: new Date(new Date(file.modifiedTime!).getTime() + (9 * 60 * 60 * 1000)),
       source: 'drive' as const,
     })) || [];
 
