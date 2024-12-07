@@ -12,6 +12,13 @@ import {
   FaRegFileArchive,
   FaRegFileCode
 } from 'react-icons/fa';
+import RefreshButton from '@/components/RefreshButton';
+
+// 페이지를 동적 렌더링하도록 설정
+export const dynamic = 'force-dynamic';
+
+// 30초마다 재증
+export const revalidate = 30;
 
 // 파일 타입별 아이콘 매핑
 const FileIcon = ({ type }: { type: string }) => {
@@ -73,7 +80,7 @@ async function getAllFiles(): Promise<ExtendedFileInfo[]> {
     const drive = getGoogleDriveClient();
     const driveFiles = await drive.files.list({
       q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents`,
-      fields: 'files(id, name, mimeType, size, modifiedTime)',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime)',
     });
 
     // 구글 드라이브 파일을 FileInfo 형식으로 변환
@@ -84,16 +91,16 @@ async function getAllFiles(): Promise<ExtendedFileInfo[]> {
       size: parseInt(file.size || '0'),
       type: file.mimeType!.split('/').pop()!,
       url: `/api/files/${file.id}`,
-      createdAt: new Date(),
+      createdAt: new Date(file.createdTime || file.modifiedTime!),
       updatedAt: new Date(file.modifiedTime!),
       source: 'drive' as const,
     })) || [];
 
-    // 로컬 파일과 드라이브 파일 합치기
-    const allFiles = [...localFilesWithSource, ...driveFilesMapped];
-    
-    // 수정일 기준으로 정렬 (최신순)
-    return allFiles.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    // 모든 파일 합치기 및 정렬
+    const allFiles = [...localFilesWithSource, ...driveFilesMapped]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return allFiles;
   } catch (error) {
     console.error('Error fetching files:', error);
     return [];
@@ -105,7 +112,10 @@ export default async function ResourcesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-base-content">공유파일</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-base-content">공유파일</h1>
+        <RefreshButton />
+      </div>
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="overflow-x-auto">
@@ -115,7 +125,7 @@ export default async function ResourcesPage() {
                   <tr>
                     <th className="text-base-content">파일명</th>
                     <th className="text-base-content">크기</th>
-                    <th className="text-base-content">수정일</th>
+                    <th className="text-base-content">�로드일</th>
                     <th className="text-base-content">다운로드</th>
                   </tr>
                 </thead>
@@ -132,7 +142,7 @@ export default async function ResourcesPage() {
                         </div>
                       </td>
                       <td className="text-base-content/70">{formatFileSize(file.size)}</td>
-                      <td className="text-base-content/70">{formatDate(file.updatedAt)}</td>
+                      <td className="text-base-content/70">{formatDate(file.createdAt)}</td>
                       <td>
                         <a
                           href={file.url}
