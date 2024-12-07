@@ -79,7 +79,12 @@
 
 /* 인라인 코드 */
 :not(pre) > code {
-  @apply rounded bg-neutral-800 px-1.5 py-0.5 text-sm font-mono text-gray-200;
+  @apply rounded bg-neutral-800 px-1.5 py-0.5 text-sm font-mono text-black;
+}
+
+/* 다크 모드일 때는 흰색으로 */
+[data-theme="dark"] :not(pre) > code {
+  @apply text-white;
 }
 
 /* 폰트 적용 */
