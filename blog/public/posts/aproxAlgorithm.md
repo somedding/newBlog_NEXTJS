@@ -2,6 +2,8 @@
 title: '근사 알고리즘'
 date: '2024-12-07'
 description: '근사 알고리즘'
+thumbnail: "/img/image.png"
+tags: ['알고리즘']
 ---
 
 # Approximation Algorithm

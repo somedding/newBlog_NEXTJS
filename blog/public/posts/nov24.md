@@ -2,6 +2,8 @@
 title: '2024년 11월 6일'
 date: '2024-11-06'
 description: '2024년 11월 공부 로그'
+image: /img/image.png
+tags: ['알고리즘']
 ---
 # 2024 년 11월 6일
 ## 알고리즘

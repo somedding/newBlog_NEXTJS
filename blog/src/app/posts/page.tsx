@@ -7,6 +7,8 @@ import { Suspense } from 'react';
 import PostSkeleton from '@/components/PostSkeleton';
 import ErrorState from '@/components/ErrorState';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import Image from 'next/image';
+import { FaRegFileAlt } from 'react-icons/fa';
 
 const POSTS_PER_PAGE = 9;
 
@@ -87,22 +89,39 @@ export default async function PostsPage({
         }>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <div key={post.slug} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-                <div className="card-body">
-                  <h2 className="card-title text-xl font-bold text-base-content">{post.frontmatter.title}</h2>
-                  {post.frontmatter.date && (
-                    <p className="text-sm text-base-content/70">{post.frontmatter.date}</p>
+              <div key={post.slug} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-[200px]">
+                <div className="flex h-full">
+                  {post.frontmatter.thumbnail ? (
+                    <figure className="relative w-1/3 h-full">
+                      <Image
+                        src={post.frontmatter.thumbnail}
+                        alt={post.frontmatter.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+                      />
+                    </figure>
+                  ) : (
+                    <div className="w-1/3 h-full bg-base-200 flex items-center justify-center">
+                      <FaRegFileAlt className="w-12 h-12 text-base-content/50" />
+                    </div>
                   )}
-                  <p className="text-base-content/80">
-                    {post.frontmatter.description || 'No description available'}
-                  </p>
-                  <div className="card-actions justify-end mt-4">
-                    <Link 
-                      href={`/posts/${post.slug}`} 
-                      className="btn btn-primary btn-sm"
-                    >
-                      Read More
-                    </Link>
+                  <div className="card-body flex-1 p-4">
+                    <h2 className="card-title text-lg font-bold text-base-content line-clamp-2">{post.frontmatter.title}</h2>
+                    {post.frontmatter.date && (
+                      <p className="text-xs text-base-content/70">{post.frontmatter.date}</p>
+                    )}
+                    <p className="text-sm text-base-content/80 line-clamp-2">
+                      {post.frontmatter.description || 'No description available'}
+                    </p>
+                    <div className="card-actions justify-end mt-auto">
+                      <Link 
+                        href={`/posts/${post.slug}`} 
+                        className="btn btn-primary btn-xs"
+                      >
+                        Read More
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
