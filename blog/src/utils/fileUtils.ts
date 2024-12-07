@@ -11,24 +11,17 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function formatDate(date: Date): string {
-  // 날짜를 한국 시간대로 변환
-  const koreanDate = new Date(date.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
-
   const dateStr = new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    timeZone: 'Asia/Seoul'  // 한국 시간대 명시
-  }).format(koreanDate);
-
-  const timeStr = new Intl.DateTimeFormat('ko-KR', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
     timeZone: 'Asia/Seoul'  // 한국 시간대 명시
-  }).format(koreanDate);
+  }).format(date);
 
-  return `${dateStr} ${timeStr}`;
+  return dateStr;
 }
 
 export async function getFiles(): Promise<FileInfo[]> {
