@@ -17,9 +17,6 @@ const MarkdownContent = dynamic(
   }
 );
 
-// 클라이언트 댓글 컴포넌트 임포트
-const ClientComments = dynamic(() => import('@/components/ClientComments'));
-
 // Next.js 13+ 타입 정의
 type PageParams = {
   slug: string;
@@ -97,8 +94,6 @@ export default async function PostPage({ params }: Props) {
             </header>
 
             <MarkdownContent content={post.htmlContent} />
-            
-            <ClientComments />
           </div>
         </Suspense>
       </article>

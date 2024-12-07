@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/supabase-adapter": "^1.7.4",
+    "@supabase/supabase-js": "^2.47.2",
     "@vercel/analytics": "^1.4.1",
     "gray-matter": "^4.0.3",
     "katex": "^0.16.11",
     "marked": "^15.0.3",
     "next": "^15.0.4",
+    "next-auth": "^4.24.11",
     "nodemailer": "^6.9.16",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
