@@ -3,12 +3,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
+interface RouteContext {
+  params: {
+    fileId: string;
+  };
+}
+
 export async function GET(
-  request: NextRequest,
-  context: { params: { fileId: string } }
+  _request: NextRequest,
+  { params }: RouteContext
 ): Promise<NextResponse> {
   try {
-    const { fileId } = context.params;
+    const { fileId } = params;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
@@ -25,7 +31,7 @@ export async function GET(
     headers.set('Content-Type', metadata.mimeType || 'application/octet-stream');
     headers.set('Content-Disposition', `attachment; filename="${metadata.name}"`);
     if (metadata.size) {
-      headers.set('Content-Length', metadata.size.toString());
+      headers.set('Content-Length', metadata.size);
     }
 
     // 스트림을 Response로 변환
