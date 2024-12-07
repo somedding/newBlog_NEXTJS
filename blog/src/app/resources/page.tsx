@@ -84,17 +84,23 @@ async function getAllFiles(): Promise<ExtendedFileInfo[]> {
     });
 
     // 구글 드라이브 파일을 FileInfo ��식으로 변환
-    const driveFilesMapped: ExtendedFileInfo[] = driveFiles.data.files?.map(file => ({
-      id: file.id!,
-      name: file.name!,
-      description: '',
-      size: parseInt(file.size || '0'),
-      type: file.mimeType!.split('/').pop()!,
-      url: `/api/files/${file.id}`,
-      createdAt: new Date(new Date(file.createdTime || file.modifiedTime!).getTime() + (9 * 60 * 60 * 1000)),
-      updatedAt: new Date(new Date(file.modifiedTime!).getTime() + (9 * 60 * 60 * 1000)),
-      source: 'drive' as const,
-    })) || [];
+    const driveFilesMapped: ExtendedFileInfo[] = driveFiles.data.files?.map(file => {
+      // 한국 시간으로 변환
+      const createdTime = new Date(file.createdTime || file.modifiedTime!);
+      const modifiedTime = new Date(file.modifiedTime!);
+      
+      return {
+        id: file.id!,
+        name: file.name!,
+        description: '',
+        size: parseInt(file.size || '0'),
+        type: file.mimeType!.split('/').pop()!,
+        url: `/api/files/${file.id}`,
+        createdAt: createdTime,
+        updatedAt: modifiedTime,
+        source: 'drive' as const,
+      };
+    }) || [];
 
     // 모든 파일 합치기 및 정렬
     const allFiles = [...localFilesWithSource, ...driveFilesMapped]

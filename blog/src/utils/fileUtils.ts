@@ -43,7 +43,7 @@ export async function getFiles(): Promise<FileInfo[]> {
           size: stats.size,
           type: path.extname(filename).slice(1),
           url: `/files/${filename}`,
-          createdAt: stats.birthtime,
+          createdAt: stats.mtime,
           updatedAt: stats.mtime,
         };
       })
