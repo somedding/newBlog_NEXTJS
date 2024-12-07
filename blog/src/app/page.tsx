@@ -25,7 +25,8 @@ import {
   FaRegFileAudio,
   FaRegFileVideo,
   FaRegFileArchive,
-  FaRegFileCode
+  FaRegFileCode,
+  FaRegFileAlt
 } from 'react-icons/fa';
 
 // 기술 스택 데이터 정의
@@ -150,17 +151,36 @@ export default async function Home() {
               모든 포스트 보기 →
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <div key={post.slug} className="shadow-xl card bg-base-100">
-                <div className="p-4 card-body sm:p-6">
-                  <h2 className="text-base card-title sm:text-lg text-base-content">{post.title}</h2>
-                  <p className="text-xs sm:text-sm text-base-content/80">{post.date}</p>
-                  <p className="text-sm sm:text-base text-base-content line-clamp-2">{post.description}</p>
-                  <div className="justify-end card-actions">
-                    <Link href={`/posts/${post.slug}`} className="btn btn-primary btn-sm">
-                      읽기
-                    </Link>
+              <div key={post.slug} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow h-[200px]">
+                <div className="flex h-full">
+                  {post.thumbnail ? (
+                    <figure className="relative w-1/3 h-full">
+                      <Image
+                        src={post.thumbnail}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+                      />
+                    </figure>
+                  ) : (
+                    <div className="w-1/3 h-full bg-base-200 flex items-center justify-center">
+                      <FaRegFileAlt className="w-12 h-12 text-base-content/50" />
+                    </div>
+                  )}
+                  <div className="card-body flex-1 p-4">
+                    <h2 className="card-title text-lg font-bold text-base-content line-clamp-2">{post.title}</h2>
+                    <p className="text-xs text-base-content/70">{post.date}</p>
+                    <p className="text-sm text-base-content/80 line-clamp-2">
+                      {post.description || 'No description available'}
+                    </p>
+                    <div className="card-actions justify-end mt-auto">
+                      <Link href={`/posts/${post.slug}`} className="btn btn-primary btn-xs">
+                        Read More
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
