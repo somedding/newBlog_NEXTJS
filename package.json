@@ -16,6 +16,8 @@
     "autoprefixer": "10.4.17",
     "gray-matter": "^4.0.3",
     "next": "14.1.0",
+    "@auth/core": "0.34.2",
+    "next-auth": "^4.24.5",
     "nodemailer": "^6.9.9",
     "postcss": "8.4.35",
     "react": "18.2.0",
@@ -36,5 +38,8 @@
     "@tailwindcss/typography": "^0.5.10",
     "@types/nodemailer": "^6.4.14",
     "daisyui": "^4.7.2"
+  },
+  "overrides": {
+    "@auth/core": "0.34.2"
   }
 } 
