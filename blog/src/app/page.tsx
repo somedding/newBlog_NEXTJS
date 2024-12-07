@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getAllPosts } from '@/utils/mdUtils';
 import { getFiles, formatFileSize, formatDate } from '@/utils/fileUtils';
+import { getGoogleDriveClient, getFileMetadata } from '@/utils/googleDrive';
+import { FileInfo } from '@/types/file';
 import { 
   SiJavascript, 
   SiTypescript, 
@@ -14,6 +16,17 @@ import {
   SiRust,
   SiPython
 } from 'react-icons/si';
+import { 
+  FaRegFile,
+  FaRegFilePdf, 
+  FaRegFileWord, 
+  FaRegFileExcel,
+  FaRegFileImage,
+  FaRegFileAudio,
+  FaRegFileVideo,
+  FaRegFileArchive,
+  FaRegFileCode
+} from 'react-icons/fa';
 
 // 기술 스택 데이터 정의
 const techStack = [
@@ -29,9 +42,81 @@ const techStack = [
   { name: 'Rust', icon: SiRust, color: '#000000' }
 ];
 
+// FileIcon 컴포넌트 추가
+const FileIcon = ({ type }: { type: string }) => {
+  switch(type.toLowerCase()) {
+    case 'pdf':
+      return <FaRegFilePdf className="w-5 h-5 text-red-500" />;
+    case 'doc':
+    case 'docx':
+      return <FaRegFileWord className="w-5 h-5 text-blue-500" />;
+    case 'xls':
+    case 'xlsx':
+      return <FaRegFileExcel className="w-5 h-5 text-green-500" />;
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+    case 'webp':
+      return <FaRegFileImage className="w-5 h-5 text-purple-500" />;
+    case 'mp3':
+    case 'wav':
+    case 'ogg':
+      return <FaRegFileAudio className="w-5 h-5 text-yellow-500" />;
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+      return <FaRegFileVideo className="w-5 h-5 text-pink-500" />;
+    case 'zip':
+    case 'rar':
+    case '7z':
+      return <FaRegFileArchive className="w-5 h-5 text-orange-500" />;
+    case 'js':
+    case 'ts':
+    case 'py':
+    case 'java':
+    case 'cpp':
+    case 'html':
+    case 'css':
+      return <FaRegFileCode className="w-5 h-5 text-gray-500" />;
+    default:
+      return <FaRegFile className="w-5 h-5 text-base-content/70" />;
+  }
+};
+
 export default async function Home() {
     const posts = getAllPosts().slice(0, 3);
-    const files = (await getFiles()).slice(0, 5);
+  
+    // 구글 드라이브 파일 가져오기
+    const drive = getGoogleDriveClient();
+    let driveFiles: FileInfo[] = [];
+  
+    try {
+      const response = await drive.files.list({
+        q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents`,
+        fields: 'files(id, name, mimeType, size, modifiedTime)',
+        pageSize: 5
+      });
+
+      driveFiles = response.data.files?.map(file => ({
+        id: file.id!,
+        name: file.name!,
+        description: '',
+        size: parseInt(file.size || '0'),
+        type: file.mimeType!.split('/').pop()!,
+        url: `/api/files/${file.id}`,
+        createdAt: new Date(),
+        updatedAt: new Date(file.modifiedTime!)
+      })) || [];
+    } catch (error) {
+      console.error('Error fetching Google Drive files:', error);
+    }
+
+    // 로컬 파일과 구글 드라이브 파일 합치기
+    const localFiles = await getFiles();
+    const allFiles = [...localFiles, ...driveFiles]
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      .slice(0, 5);
   
     return (
       <div className="container p-2 mx-auto space-y-6 sm:p-4 sm:space-y-8">
@@ -94,7 +179,7 @@ export default async function Home() {
           <div className="shadow-xl card bg-base-100">
             <div className="p-2 card-body sm:p-6">
               <div className="-mx-2 overflow-x-auto sm:mx-0">
-                {files.length > 0 ? (
+                {allFiles.length > 0 ? (
                   <table className="table w-full text-sm table-zebra sm:text-base">
                     <thead>
                       <tr>
@@ -105,22 +190,29 @@ export default async function Home() {
                       </tr>
                     </thead>
                     <tbody>
-                      {files.map((file) => (
+                      {allFiles.map((file) => (
                         <tr key={file.id}>
                           <td className="text-base-content">
                             <div className="flex items-center space-x-2">
-                              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-base-content/70" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5z"/>
-                              </svg>
-                              <span className="truncate max-w-[120px] sm:max-w-none">{file.name}</span>
+                              <FileIcon type={file.type} />
+                              <span>{file.name}</span>
+                              {file.url.startsWith('/api/files/') && (
+                                <span className="badge badge-sm">Drive</span>
+                              )}
                             </div>
                           </td>
-                          <td className="hidden text-base-content/70 sm:table-cell">{formatFileSize(file.size)}</td>
-                          <td className="hidden text-base-content/70 sm:table-cell">{formatDate(file.updatedAt)}</td>
+                          <td className="hidden text-base-content/70 sm:table-cell">
+                            {formatFileSize(file.size)}
+                          </td>
+                          <td className="hidden text-base-content/70 sm:table-cell">
+                            {formatDate(file.updatedAt)}
+                          </td>
                           <td>
                             <a
                               href={file.url}
-                              download
+                              download={!file.url.startsWith('/api/files/')}
+                              target={file.url.startsWith('/api/files/') ? '_blank' : undefined}
+                              rel={file.url.startsWith('/api/files/') ? 'noopener noreferrer' : undefined}
                               className="btn btn-primary btn-xs sm:btn-sm"
                             >
                               <svg 
