@@ -3,18 +3,18 @@ import { NextRequest } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
-interface Context {
-  params: {
-    fileId: string;
-  };
-}
+// Next.js App Router의 API route 타입 정의
+type RouteContext = {
+  params: { fileId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
 export async function GET(
-  request: NextRequest,
-  context: Context
+  _request: NextRequest,
+  { params }: RouteContext
 ) {
   try {
-    const { fileId } = context.params;
+    const { fileId } = params;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
