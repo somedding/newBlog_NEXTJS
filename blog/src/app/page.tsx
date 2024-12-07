@@ -95,7 +95,7 @@ export default async function Home() {
     try {
       const response = await drive.files.list({
         q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents`,
-        fields: 'files(id, name, mimeType, size, modifiedTime)',
+        fields: 'files(id, name, mimeType, size, createdTime, modifiedTime)',
         pageSize: 5
       });
 
@@ -106,7 +106,7 @@ export default async function Home() {
         size: parseInt(file.size || '0'),
         type: file.mimeType!.split('/').pop()!,
         url: `/api/files/${file.id}`,
-        createdAt: new Date(),
+        createdAt: new Date(file.createdTime || file.modifiedTime!),
         updatedAt: new Date(file.modifiedTime!)
       })) || [];
     } catch (error) {
@@ -116,7 +116,7 @@ export default async function Home() {
     // 로컬 파일과 구글 드라이브 파일 합치기
     const localFiles = await getFiles();
     const allFiles = [...localFiles, ...driveFiles]
-      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, 5);
   
     return (
@@ -205,7 +205,7 @@ export default async function Home() {
                       <tr>
                         <th className="text-base-content">파일명</th>
                         <th className="hidden text-base-content sm:table-cell">크기</th>
-                        <th className="hidden text-base-content sm:table-cell">수정일</th>
+                        <th className="hidden text-base-content sm:table-cell">업로드일</th>
                         <th className="text-base-content">다운로드</th>
                       </tr>
                     </thead>
@@ -225,7 +225,7 @@ export default async function Home() {
                             {formatFileSize(file.size)}
                           </td>
                           <td className="hidden text-base-content/70 sm:table-cell">
-                            {formatDate(file.updatedAt)}
+                            {formatDate(file.createdAt)}
                           </td>
                           <td>
                             <a

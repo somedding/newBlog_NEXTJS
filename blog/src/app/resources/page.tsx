@@ -125,7 +125,7 @@ export default async function ResourcesPage() {
                   <tr>
                     <th className="text-base-content">파일명</th>
                     <th className="text-base-content">크기</th>
-                    <th className="text-base-content">�로드일</th>
+                    <th className="text-base-content">업로드일</th>
                     <th className="text-base-content">다운로드</th>
                   </tr>
                 </thead>
@@ -155,7 +155,7 @@ export default async function ResourcesPage() {
                             className="w-4 h-4 mr-1" 
                             fill="none" 
                             stroke="currentColor" 
-                            viewBox="0 0 24 24"
+                            viewBox="0 0 18 24"
                           >
                             <path 
                               strokeLinecap="round" 
@@ -164,7 +164,6 @@ export default async function ResourcesPage() {
                               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                             />
                           </svg>
-                          다운로드
                         </a>
                       </td>
                     </tr>
