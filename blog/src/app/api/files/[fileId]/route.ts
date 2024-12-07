@@ -3,18 +3,18 @@ import { NextRequest } from 'next/server';
 import { Readable } from 'stream';
 import { GaxiosResponse } from 'gaxios';
 
-type Props = {
+interface Context {
   params: {
     fileId: string;
   };
-};
+}
 
 export async function GET(
   request: NextRequest,
-  props: Props
+  context: Context
 ) {
   try {
-    const { fileId } = props.params;
+    const { fileId } = context.params;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
