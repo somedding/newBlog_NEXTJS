@@ -26,41 +26,41 @@
 
 /* Syntax highlighting */
 [data-rehype-pretty-code-fragment] {
-  @apply relative my-4 overflow-hidden border rounded-lg border-base-300;
+  @apply relative my-4 overflow-hidden border rounded-lg border-base-300 shadow-lg;
 }
 
 [data-rehype-pretty-code-fragment] pre {
-  @apply py-4 overflow-x-auto bg-base-200/50;
+  @apply py-4 overflow-x-auto bg-base-200;
 }
 
 [data-rehype-pretty-code-fragment] code {
-  @apply grid min-w-full p-0 break-words border-0 rounded-none;
+  @apply grid min-w-full p-0 break-words border-0 rounded-none font-medium text-base-content;
   counter-reset: line;
   box-decoration-break: clone;
 }
 
 [data-rehype-pretty-code-fragment] .line {
-  @apply border-l-2 border-l-transparent px-4 py-0.5;
+  @apply border-l-2 border-l-transparent px-4 py-0.5 text-base-content;
 }
 
 [data-rehype-pretty-code-fragment] .line--highlighted {
-  @apply border-l-primary bg-primary/10;
+  @apply border-l-primary bg-primary/30 font-bold;
 }
 
 [data-rehype-pretty-code-fragment] .word--highlighted {
-  @apply p-1 rounded-md bg-primary/10 border-primary/10;
+  @apply p-1 rounded-md bg-primary/30 border-primary/30 font-bold;
 }
 
 /* Line numbers */
 [data-rehype-pretty-code-fragment] .line::before {
-  @apply inline-block w-4 mr-4 text-right text-base-content/40;
+  @apply inline-block w-4 mr-4 text-right text-base-content/70;
   counter-increment: line;
   content: counter(line);
 }
 
 /* Code block title */
 [data-rehype-pretty-code-title] {
-  @apply flex items-center justify-between px-4 py-2 font-mono text-sm border-b rounded-t-lg border-base-300 bg-base-300 text-base-content;
+  @apply flex items-center justify-between px-4 py-2 font-mono text-sm font-bold border-b rounded-t-lg border-base-300 bg-base-300 text-base-content;
 }
 
 [data-rehype-pretty-code-title] + pre {
@@ -69,7 +69,7 @@
 
 /* Inline code */
 :not(pre) > code {
-  @apply rounded bg-base-200 px-1.5 py-0.5 text-base-content text-sm font-mono;
+  @apply rounded bg-base-200 px-1.5 py-0.5 text-base-content text-sm font-mono font-medium shadow-sm;
 }
 
 /* 폰트 적용 */

@@ -31,7 +31,7 @@ export async function markdownToHtml(markdown: string) {
     .use(remarkRehype)
     .use(rehypeKatex)
     .use(rehypePrettyCode, {
-      theme: 'github-dark',
+      theme: 'solarized-dark',
       keepBackground: false,
       onVisitLine(node) {
         if ('children' in node && Array.isArray(node.children) && node.children.length === 0) {
