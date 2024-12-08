@@ -23,6 +23,13 @@ import {
   SiSpring,
 } from 'react-icons/si';
 import { TbBrandChrome } from 'react-icons/tb';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import googleCalendarPlugin from '@fullcalendar/google-calendar';
+import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import RefreshButton from '@/components/RefreshButton';
 
 // 기술 스택 데이터 정의
 const techStack = [
@@ -44,7 +51,14 @@ const techStack = [
   { name: 'Docker', icon: SiDocker, color: '#2496ED' },
 ];
 
-export default function ContactPage() {
+interface CalendarProps {
+  calendarData: {
+    googleCalendarApiKey: string;
+    googleCalendarId: string;
+  };
+}
+
+export default function ContactPage({ calendarData }: CalendarProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -98,6 +112,17 @@ export default function ContactPage() {
     } catch (err) {
       console.error('Failed to copy email:', err);
     }
+  };
+
+  // 캘린더 이벤트 핸들러
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
+    // 날짜 선택 시 처리
+    console.log('Selected date:', selectInfo.startStr);
+  };
+
+  const handleEventClick = (clickInfo: EventClickArg) => {
+    // 이벤트 클릭 시 처리
+    console.log('Clicked event:', clickInfo.event.title);
   };
 
   return (
@@ -192,6 +217,69 @@ export default function ContactPage() {
       </div>
 
       <div>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-base-content">일정</h2>
+          <RefreshButton />
+        </div>
+        <div className="shadow-xl card bg-base-100">
+          <div className="card-body">
+            <FullCalendar
+              plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin,
+                googleCalendarPlugin
+              ]}
+              initialView="dayGridMonth"
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              timeZone='Asia/Seoul'
+              googleCalendarApiKey={calendarData.googleCalendarApiKey}
+              eventSources={[
+                {
+                  googleCalendarId: calendarData.googleCalendarId,
+                  className: 'gcal-event'
+                }
+              ]}
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+              }}
+              locale="ko"
+              height="auto"
+              slotMinTime="00:00:00"
+              slotMaxTime="24:00:00"
+              views={{
+                dayGridMonth: {
+                  dayMaxEvents: true
+                },
+                timeGridWeek: {
+                  slotDuration: '01:00:00',
+                  slotLabelFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    omitZeroMinute: true,
+                    meridiem: 'short'
+                  },
+                  allDaySlot: false,
+                  nowIndicator: true,
+                  dayHeaderFormat: { weekday: 'short', month: 'numeric', day: 'numeric', omitCommas: true }
+                }
+              }}
+              eventDisplay="block"
+              displayEventEnd={true}
+              nowIndicator={true}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
         <h2 className="mb-8 text-3xl font-bold text-base-content">메일 보내기</h2>
         <div className="shadow-xl card bg-base-100">
           <div className="card-body">
@@ -206,7 +294,7 @@ export default function ContactPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="이름을 입력하세��"
+                    placeholder="이름을 입력하세요"
                     className="w-full input input-bordered"
                     required
                   />

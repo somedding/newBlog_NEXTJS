@@ -11,6 +11,11 @@
   "dependencies": {
     "@auth/core": "0.34.2",
     "@auth/supabase-adapter": "^1.7.4",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/google-calendar": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@supabase/supabase-js": "^2.47.2",
     "@vercel/analytics": "^1.4.1",
     "googleapis": "^144.0.0",
