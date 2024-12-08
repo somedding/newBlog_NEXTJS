@@ -12,10 +12,18 @@ import {
   SiNodedotjs,
   SiTailwindcss,
   SiGit,
-  SiC,
   SiRust,
-  SiPython
+  SiPython,
+  SiMongodb,
+  SiMysql,
+  SiDocker,
+  SiReact as SiReactNative,
+  SiSwift,
+  SiHtml5,
+  SiCss3,
+  SiSpring,
 } from 'react-icons/si';
+import { TbBrandChrome } from 'react-icons/tb';
 import { 
   FaRegFile,
   FaRegFilePdf, 
@@ -33,14 +41,20 @@ import {
 const techStack = [
   { name: 'JavaScript', icon: SiJavascript, color: '#F7DF1E' },
   { name: 'TypeScript', icon: SiTypescript, color: '#3178C6' },
-  { name: 'Python', icon: SiPython, color: '#3776AB' },
   { name: 'React', icon: SiReact, color: '#61DAFB' },
   { name: 'Next.js', icon: SiNextdotjs, color: '#000000' },
-  { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
   { name: 'TailwindCSS', icon: SiTailwindcss, color: '#06B6D4' },
+  { name: 'Chrome Extension', icon: TbBrandChrome, color: '#4285F4' },
+  { name: 'React Native', icon: SiReactNative, color: '#61DAFB' },
+  { name: 'Swift', icon: SiSwift, color: '#F05138' },
+  { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
+  { name: 'Python', icon: SiPython, color: '#3776AB' },
+  { name: 'Rust', icon: SiRust, color: '#000000' },
+  { name: 'Spring', icon: SiSpring, color: '#6DB33D' },
+  { name: 'MongoDB', icon: SiMongodb, color: '#47A248' },
+  { name: 'MySQL', icon: SiMysql, color: '#4479A1' },
   { name: 'Git', icon: SiGit, color: '#F05032' },
-  { name: 'C', icon: SiC, color: '#A8B9CC' },
-  { name: 'Rust', icon: SiRust, color: '#000000' }
+  { name: 'Docker', icon: SiDocker, color: '#2496ED' },
 ];
 
 // FileIcon 컴포넌트 추가
@@ -88,7 +102,7 @@ const FileIcon = ({ type }: { type: string }) => {
 export default async function Home() {
     const posts = getAllPosts().slice(0, 3);
   
-    // 구글 드라이브 파일 가져오기
+    // 구글 드라이브 파일 가���오기
     const drive = getGoogleDriveClient();
     let driveFiles: FileInfo[] = [];
   
@@ -282,11 +296,11 @@ export default async function Home() {
                 {techStack.map((tech) => (
                   <div 
                     key={tech.name} 
-                    className="flex items-center gap-1 p-3 text-xs font-medium transition-shadow sm:gap-2 badge badge-lg sm:p-4 hover:shadow-md sm:text-sm"
+                    className="flex items-center gap-2 p-4 font-medium transition-shadow badge badge-lg hover:shadow-md"
                     style={{ backgroundColor: `${tech.color}20` }}
                   >
                     <tech.icon 
-                      className="text-lg sm:text-xl"
+                      className="text-xl"
                       style={{ color: tech.color }}
                     />
                     <span className="text-base-content">{tech.name}</span>

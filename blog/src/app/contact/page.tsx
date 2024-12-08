@@ -11,23 +11,37 @@ import {
   SiNodedotjs,
   SiTailwindcss,
   SiGit,
-  SiC,
   SiRust,
-  SiPython
+  SiPython,
+  SiMongodb,
+  SiMysql,
+  SiDocker,
+  SiReact as SiReactNative,
+  SiSwift,
+  SiHtml5,
+  SiCss3,
+  SiSpring,
 } from 'react-icons/si';
+import { TbBrandChrome } from 'react-icons/tb';
 
 // 기술 스택 데이터 정의
 const techStack = [
   { name: 'JavaScript', icon: SiJavascript, color: '#F7DF1E' },
   { name: 'TypeScript', icon: SiTypescript, color: '#3178C6' },
-  { name: 'Python', icon: SiPython, color: '#3776AB' },
   { name: 'React', icon: SiReact, color: '#61DAFB' },
   { name: 'Next.js', icon: SiNextdotjs, color: '#000000' },
-  { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
   { name: 'TailwindCSS', icon: SiTailwindcss, color: '#06B6D4' },
+  { name: 'Chrome Extension', icon: TbBrandChrome, color: '#4285F4' },
+  { name: 'React Native', icon: SiReactNative, color: '#61DAFB' },
+  { name: 'Swift', icon: SiSwift, color: '#F05138' },
+  { name: 'Node.js', icon: SiNodedotjs, color: '#339933' },
+  { name: 'Python', icon: SiPython, color: '#3776AB' },
+  { name: 'Rust', icon: SiRust, color: '#000000' },
+  { name: 'Spring', icon: SiSpring, color: '#6DB33D' },
+  { name: 'MongoDB', icon: SiMongodb, color: '#47A248' },
+  { name: 'MySQL', icon: SiMysql, color: '#4479A1' },
   { name: 'Git', icon: SiGit, color: '#F05032' },
-  { name: 'C', icon: SiC, color: '#A8B9CC' },
-  { name: 'Rust', icon: SiRust, color: '#000000' }
+  { name: 'Docker', icon: SiDocker, color: '#2496ED' },
 ];
 
 export default function ContactPage() {
@@ -192,7 +206,7 @@ export default function ContactPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="이름을 입력하세요"
+                    placeholder="이름을 입력하세��"
                     className="w-full input input-bordered"
                     required
                   />
