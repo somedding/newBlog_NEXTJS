@@ -115,13 +115,14 @@ const projects = [
     title: "IFU",
     icon: FaCode,
     period: "2024.07 - 2024.08",
-    role: "프론트엔드 개발",
+    role: "프론트엔드",
     description: "크롬익스텐션 , 프론트엔드 개발",
     skills: [
       { name: 'HTML', icon: SiHtml5, color: '#E34F26' },
       { name: 'CSS', icon: SiCss3, color: '#1572B6' },
       { name: 'JavaScript', icon: SiJavascript, color: '#F7DF1E' },
       { name: 'Spring', icon: SiSpring, color: '#6DB33D' },
+      { name: 'Chrome Extension', icon: TbBrandChrome, color: '#4285F4' },
     ],
     link: "https://github.com/somedding/TwoS"
   }
