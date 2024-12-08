@@ -5,10 +5,10 @@ import { GaxiosResponse } from 'gaxios';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { fileId: string } }
+  { params }: { params: { fileId: string } }
 ): Promise<NextResponse> {
   try {
-    const { fileId } = context.params;
+    const fileId = await params.fileId;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
@@ -20,10 +20,16 @@ export async function GET(
       { responseType: 'stream' }
     );
 
+    // 파일명 인코딩
+    const encodedFilename = encodeURIComponent(metadata.name || 'download');
+
     // 응답 헤더 설정
     const headers = new Headers();
     headers.set('Content-Type', metadata.mimeType || 'application/octet-stream');
-    headers.set('Content-Disposition', `attachment; filename="${metadata.name}"`);
+    headers.set(
+      'Content-Disposition', 
+      `attachment; filename*=UTF-8''${encodedFilename}`
+    );
     if (metadata.size) {
       headers.set('Content-Length', metadata.size.toString());
     }
