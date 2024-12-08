@@ -106,3 +106,40 @@ h1, h2, h3, h4, h5, h6, button, .font-en {
 [data-rehype-pretty-code-title] {
   @apply flex items-center justify-between;
 }
+
+/* FullCalendar 커스텀 스타일 */
+.fc .fc-button-primary {
+  @apply bg-primary border-primary hover:bg-primary/80 hover:border-primary/80;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  @apply bg-primary/90 border-primary/90;
+}
+
+.fc .fc-button-primary:disabled {
+  @apply bg-primary/70 border-primary/70;
+}
+
+.fc .fc-today-button {
+  @apply bg-primary border-primary hover:bg-primary/80 hover:border-primary/80;
+}
+
+/* 오늘 날짜 하이라이트 */
+.fc .fc-day-today {
+  @apply bg-primary/10 !important;
+}
+
+/* 현재 시간 표시선 */
+.fc .fc-timegrid-now-indicator-line {
+  @apply border-primary !important;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  @apply border-primary !important;
+}
+
+/* 이벤트 색상 */
+.fc-event {
+  @apply bg-primary border-primary !important;
+}
