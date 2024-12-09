@@ -16,6 +16,7 @@ interface Photo {
   tags?: string[];
   uploadedAt: string;
   modifiedTime: string;
+  takenAt: string;
 }
 
 interface ExifData {
@@ -106,18 +107,24 @@ export default function GalleryPage() {
   // 사진들을 날짜별로 그룹화하는 함수
   const groupPhotosByDate = (photos: Photo[]) => {
     const groups = photos.reduce((acc, photo) => {
-      const date = photo.uploadedAt;
-      if (!acc[date]) {
-        acc[date] = [];
+      const date = new Date(photo.takenAt);
+      const dateKey = new Intl.DateTimeFormat('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
       }
-      acc[date].push(photo);
+      acc[dateKey].push(photo);
       return acc;
     }, {} as Record<string, Photo[]>);
 
     // 날짜순으로 정렬
     return Object.entries(groups).sort((a, b) => {
-      const dateA = new Date(a[0].replace(/\./g, '-'));
-      const dateB = new Date(b[0].replace(/\./g, '-'));
+      const dateA = new Date(a[1][0].takenAt);
+      const dateB = new Date(b[1][0].takenAt);
       return dateB.getTime() - dateA.getTime();
     });
   };
@@ -128,14 +135,14 @@ export default function GalleryPage() {
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     
     return photos.filter(photo => 
-      new Date(photo.modifiedTime) > oneMonthAgo
+      new Date(photo.takenAt) > oneMonthAgo
     );
   };
 
   // 사진들을 월별로 그룹화하는 함수
   const groupPhotosByMonth = (photos: Photo[]) => {
     const groups = photos.reduce((acc, photo) => {
-      const date = new Date(photo.modifiedTime);
+      const date = new Date(photo.takenAt);
       const monthKey = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
       
       if (!acc[monthKey]) {
@@ -157,7 +164,7 @@ export default function GalleryPage() {
   const displayedPhotos = useMemo(() => {
     const recentPhotos = filterRecentPhotos(photos);
     const olderPhotos = photos.filter(photo => 
-      new Date(photo.modifiedTime) <= new Date(new Date().setMonth(new Date().getMonth() - 1))
+      new Date(photo.takenAt) <= new Date(new Date().setMonth(new Date().getMonth() - 1))
     );
 
     const groupedOlderPhotos = groupPhotosByMonth(olderPhotos);

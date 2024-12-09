@@ -1,5 +1,6 @@
 import { getGoogleDriveClient } from '@/utils/googleDrive';
 import { NextResponse } from 'next/server';
+import exifr from 'exifr';
 
 export async function GET() {
   try {
@@ -10,30 +11,43 @@ export async function GET() {
       orderBy: 'modifiedTime desc'
     });
 
-    const images = response.data.files?.map(file => {
-      const highQualityThumbnail = file.thumbnailLink?.replace('=s220', '=s1000') || '';
-      const tags = file.properties?.tags ? JSON.parse(file.properties.tags) : [];
-      
-      const modifiedDate = new Date(file.modifiedTime!);
+    const images = await Promise.all(response.data.files?.map(async file => {
+      const imageResponse = await drive.files.get({
+        fileId: file.id!,
+        alt: 'media',
+        fields: '*'
+      }, {
+        responseType: 'arraybuffer'
+      });
+
+      const buffer = Buffer.from(imageResponse.data);
+      const exifData = await exifr.parse(buffer);
+      const takenDate = exifData?.DateTimeOriginal 
+        ? new Date(exifData.DateTimeOriginal)
+        : new Date(file.createdTime!);
+
       const formattedDate = new Intl.DateTimeFormat('ko-KR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
-      }).format(modifiedDate);
+      }).format(takenDate);
 
       return {
-        id: file.id,
-        src: highQualityThumbnail,
-        title: file.name,
-        thumbnailUrl: highQualityThumbnail,
+        id: file.id!,
+        src: file.thumbnailLink?.replace('=s220', '=s1000') || '',
+        title: file.name!,
+        thumbnailUrl: file.thumbnailLink?.replace('=s220', '=s1000') || '',
         fullUrl: `/api/gallery/${file.id}`,
         createdTime: file.createdTime,
         description: file.description || '',
-        tags: tags,
+        tags: file.properties?.tags ? JSON.parse(file.properties.tags) : [],
         uploadedAt: formattedDate,
-        modifiedTime: modifiedDate.toISOString()
+        modifiedTime: file.modifiedTime!,
+        takenAt: takenDate.toISOString()
       };
-    }) || [];
+    }) || []);
+
+    images.sort((a, b) => new Date(b.takenAt).getTime() - new Date(a.takenAt).getTime());
 
     return NextResponse.json(images);
   } catch (error) {
