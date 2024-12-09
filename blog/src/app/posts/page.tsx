@@ -57,24 +57,20 @@ export default async function PostsPage({
 }: {
   searchParams: { page?: string }
 }) {
-  const currentPage = Number(searchParams.page) || 1;
-  
+  // searchParams를 await로 처리
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+
   try {
     const allPosts = await getPosts();
+    const postsPerPage = 9;
     const totalPosts = allPosts.length;
-    
-    if (totalPosts === 0) {
-      return (
-        <ErrorState 
-          message="포스트를 찾을 수 없습니다." 
-        />
-      );
-    }
+    const totalPages = Math.ceil(totalPosts / postsPerPage);
 
-    const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+    // 현재 페이지의 포스트들만 선택
     const posts = allPosts.slice(
-      (currentPage - 1) * POSTS_PER_PAGE,
-      currentPage * POSTS_PER_PAGE
+      (currentPage - 1) * postsPerPage,
+      currentPage * postsPerPage
     );
 
     return (
@@ -166,11 +162,13 @@ export default async function PostsPage({
       </div>
     );
   } catch (error) {
+    console.error('Error loading posts:', error);
     return (
-      <ErrorState 
-        message="포스트를 불러오는 중 오류가 발생했습니다." 
-        retry={() => window.location.reload()}
-      />
+      <div className="container mx-auto px-4 py-8">
+        <p className="text-center text-base-content/70">
+          포스트를 불러오는데 실패했습니다.
+        </p>
+      </div>
     );
   }
 }
