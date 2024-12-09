@@ -21,6 +21,7 @@ export default function GalleryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [isModalImageLoading, setIsModalImageLoading] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
 
   const breakpointColumns = {
     default: 4,
@@ -51,6 +52,34 @@ export default function GalleryPage() {
     loadImages();
   }, []);
 
+  const handlePhotoClick = async (photo: Photo) => {
+    setSelectedPhoto(photo);
+    setIsModalImageLoading(true);
+    setModalImageUrl(null);
+
+    try {
+      const response = await fetch(`/api/gallery/${photo.id}`);
+      if (!response.ok) throw new Error('Failed to load image');
+      
+      const imageBlob = await response.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setModalImageUrl(imageUrl);
+    } catch (error) {
+      console.error('Error loading full image:', error);
+      alert('이미지를 불러오는데 실패했습니다.');
+    } finally {
+      setIsModalImageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (modalImageUrl) {
+        URL.revokeObjectURL(modalImageUrl);
+      }
+    };
+  }, [modalImageUrl]);
+
   return (
     <div className="container px-4 py-8 mx-auto">
       <h1 className="mb-8 text-3xl font-bold text-base-content">갤러리</h1>
@@ -69,7 +98,7 @@ export default function GalleryPage() {
             <div 
               key={photo.id} 
               className="mb-4 overflow-hidden transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl cursor-pointer"
-              onClick={() => setSelectedPhoto(photo)}
+              onClick={() => handlePhotoClick(photo)}
             >
               <div className="relative aspect-auto max-h-[600px] group">
                 <Image
@@ -108,19 +137,16 @@ export default function GalleryPage() {
                   <span className="loading loading-spinner loading-lg text-primary"></span>
                 </div>
               )}
-              <Image
-                src={selectedPhoto.fullUrl}
-                alt={selectedPhoto.title}
-                width={1200}
-                height={1200}
-                className={`object-contain max-h-[80vh] w-auto h-auto transition-opacity duration-300 ${
-                  isModalImageLoading ? 'opacity-0' : 'opacity-100'
-                }`}
-                quality={100}
-                onLoadingComplete={() => setIsModalImageLoading(false)}
-                onLoad={() => setIsModalImageLoading(false)}
-                onLoadStart={() => setIsModalImageLoading(true)}
-              />
+              {modalImageUrl && (
+                <Image
+                  src={modalImageUrl}
+                  alt={selectedPhoto.title}
+                  width={1200}
+                  height={1200}
+                  className="object-contain max-h-[80vh] w-auto h-auto"
+                  quality={100}
+                />
+              )}
             </div>
             <div className="mt-4 space-y-2">
               <h3 className="text-lg font-bold">{selectedPhoto.title}</h3>
@@ -141,6 +167,7 @@ export default function GalleryPage() {
                 className="btn" 
                 onClick={() => {
                   setSelectedPhoto(null);
+                  setModalImageUrl(null);
                   setIsModalImageLoading(false);
                 }}
               >
@@ -151,6 +178,7 @@ export default function GalleryPage() {
           <form method="dialog" className="modal-backdrop">
             <button onClick={() => {
               setSelectedPhoto(null);
+              setModalImageUrl(null);
               setIsModalImageLoading(false);
             }}>
               닫기
