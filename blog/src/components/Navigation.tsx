@@ -18,6 +18,7 @@ export default function Navigation() {
             <li><Link href="/posts">포스트</Link></li>
             <li><Link href="/about">자기소개</Link></li>
             <li><Link href="/resources">공유파일</Link></li>
+            <li><Link href="/gallery">갤러리</Link></li>
             <li><Link href="/contact">연락처</Link></li>
           </ul>
         </div>
@@ -37,6 +38,7 @@ export default function Navigation() {
           <li><Link href="/posts">포스트</Link></li>
           <li><Link href="/about">자기소개</Link></li>
           <li><Link href="/resources">공유파일</Link></li>
+          <li><Link href="/gallery">갤러리</Link></li>
           <li><Link href="/contact">연락처</Link></li>
         </ul>
       </div>
