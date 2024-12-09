@@ -32,11 +32,13 @@ export async function GET() {
         day: 'numeric'
       }).format(takenDate);
 
+      const thumbnailUrl = file.thumbnailLink?.replace('=s220', '=s300') || '';
+
       return {
         id: file.id!,
-        src: file.thumbnailLink?.replace('=s220', '=s1000') || '',
+        src: thumbnailUrl,
         title: file.name!,
-        thumbnailUrl: file.thumbnailLink?.replace('=s220', '=s1000') || '',
+        thumbnailUrl: thumbnailUrl,
         fullUrl: `/api/gallery/${file.id}`,
         createdTime: file.createdTime,
         description: file.description || '',
