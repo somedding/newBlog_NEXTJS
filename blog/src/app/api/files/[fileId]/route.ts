@@ -5,10 +5,10 @@ import { GaxiosResponse } from 'gaxios';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  context: { params: { fileId: string } }
 ): Promise<NextResponse> {
   try {
-    const fileId = await params.fileId;
+    const fileId = context.params.fileId;
     const drive = getGoogleDriveClient();
     
     // 파일 메타데이터 가져오기
