@@ -102,7 +102,7 @@ const FileIcon = ({ type }: { type: string }) => {
 export default async function Home() {
     const posts = getAllPosts().slice(0, 3);
   
-    // 구글 드라이브 파일 가���오기
+    // 구글 드라이브 파일 가져오기
     const drive = getGoogleDriveClient();
     let driveFiles: FileInfo[] = [];
   
@@ -110,11 +110,11 @@ export default async function Home() {
       const response = await drive.files.list({
         q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents`,
         fields: 'files(id, name, mimeType, size, createdTime, modifiedTime)',
-        pageSize: 5
+        pageSize: 5,
+        orderBy: 'modifiedTime desc'
       });
 
       driveFiles = response.data.files?.map(file => {
-        // 한국 시간으로 변환
         const createdTime = new Date(file.createdTime || file.modifiedTime!);
         const modifiedTime = new Date(file.modifiedTime!);
         
