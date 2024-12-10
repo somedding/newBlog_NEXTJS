@@ -27,6 +27,7 @@ interface ExifData {
   shutterSpeed: string;
   iso: string;
   takenAt: string;
+  location: string;
 }
 
 export default function GalleryPage() {
@@ -460,6 +461,7 @@ export default function GalleryPage() {
                     </div>
                     <div className="col-span-2">
                       <p><span className="font-semibold">촬영일시:</span> {exifData.takenAt}</p>
+                      <p><span className="font-semibold">촬영장소:</span> {exifData.location}</p>
                     </div>
                   </div>
                 )}
