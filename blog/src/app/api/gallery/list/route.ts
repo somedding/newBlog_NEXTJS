@@ -32,7 +32,7 @@ export async function GET() {
         day: 'numeric'
       }).format(takenDate);
 
-      const thumbnailUrl = file.thumbnailLink?.replace('=s220', '=s300') || '';
+      const thumbnailUrl = file.thumbnailLink?.replace('=s220', '=s200') || '';
 
       return {
         id: file.id!,
@@ -62,3 +62,5 @@ export async function GET() {
     });
   }
 } 
+
+export const revalidate = 3600; // 1시간 캐싱 
