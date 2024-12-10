@@ -432,7 +432,7 @@ export default function GalleryPage() {
               <div className="relative w-full flex-1 flex items-center justify-center min-h-[200px]">
                 {isModalImageLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-base-100/50">
-                    <span className="loading loading-spinner loading-lg text-primary"></span>
+                    <span className="loading loading-dots loading-lg text-primary"></span>
                   </div>
                 )}
                 {modalImageUrl && (
