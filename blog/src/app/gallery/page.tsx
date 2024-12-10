@@ -427,14 +427,15 @@ export default function GalleryPage() {
                   </div>
                 )}
                 {modalImageUrl && (
-                  <div className="modal-image">
+                  <div className="modal-image w-full h-full flex items-center justify-center">
                     <Image
                       src={modalImageUrl}
                       alt={selectedPhoto.title}
                       width={1200}
                       height={1200}
-                      className="object-contain w-auto h-auto max-h-[80vh]"
+                      className="object-contain w-auto h-auto max-h-[100vh]"
                       quality={100}
+                      style={{ margin: 'auto' }}
                     />
                   </div>
                 )}
