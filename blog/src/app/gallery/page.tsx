@@ -187,14 +187,13 @@ export default function GalleryPage() {
   // 전체화면 토글 함수
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      // 전체화면으로 전환
-      const modalElement = document.querySelector('.modal-box');
-      if (modalElement) {
-        modalElement.requestFullscreen();
+      // 이미지 요소만 전체화면으로 전환
+      const imageElement = document.querySelector('.modal-image');
+      if (imageElement) {
+        imageElement.requestFullscreen();
         setIsFullscreen(true);
       }
     } else {
-      // 전체화면 해제
       document.exitFullscreen();
       setIsFullscreen(false);
     }
@@ -390,7 +389,7 @@ export default function GalleryPage() {
       {/* 모달 */}
       {selectedPhoto && (
         <dialog className="modal modal-open">
-          <div className={`modal-box max-w-5xl max-h-[90vh] overflow-auto ${isFullscreen ? 'fixed inset-0 w-full h-full max-w-none max-h-none rounded-none' : ''}`}>
+          <div className="modal-box max-w-5xl max-h-[90vh] overflow-auto">
             <div className="relative w-full h-full flex flex-col">
               {/* 상단 버튼 영역 */}
               <div className="absolute top-2 right-2 flex gap-2 z-10">
@@ -428,19 +427,21 @@ export default function GalleryPage() {
                   </div>
                 )}
                 {modalImageUrl && (
-                  <Image
-                    src={modalImageUrl}
-                    alt={selectedPhoto.title}
-                    width={1200}
-                    height={1200}
-                    className={`object-contain w-auto h-auto ${isFullscreen ? 'max-h-screen' : 'max-h-[80vh]'}`}
-                    quality={100}
-                  />
+                  <div className="modal-image">
+                    <Image
+                      src={modalImageUrl}
+                      alt={selectedPhoto.title}
+                      width={1200}
+                      height={1200}
+                      className="object-contain w-auto h-auto max-h-[80vh]"
+                      quality={100}
+                    />
+                  </div>
                 )}
               </div>
 
               {/* 메타데이터 영역 */}
-              <div className={`mt-4 space-y-4 ${isFullscreen ? 'bg-base-100/80 p-4 rounded-lg backdrop-blur' : ''}`}>
+              <div className="mt-4 space-y-4">
                 <h3 className="text-lg font-bold">{selectedPhoto.title}</h3>
                 
                 {/* EXIF 데이터 표시 */}
@@ -476,17 +477,15 @@ export default function GalleryPage() {
               </div>
             </div>
           </div>
-          {!isFullscreen && (
-            <form method="dialog" className="modal-backdrop">
-              <button onClick={() => {
-                setSelectedPhoto(null);
-                setModalImageUrl(null);
-                setIsModalImageLoading(false);
-              }}>
-                닫기
-              </button>
-            </form>
-          )}
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => {
+              setSelectedPhoto(null);
+              setModalImageUrl(null);
+              setIsModalImageLoading(false);
+            }}>
+              닫기
+            </button>
+          </form>
         </dialog>
       )}
     </div>
