@@ -32,7 +32,7 @@ export async function GET() {
         day: 'numeric'
       }).format(takenDate);
 
-      const thumbnailUrl = file.thumbnailLink?.replace('=s220', '=s200') || '';
+      const thumbnailUrl = file.thumbnailLink?.replace('=s220', '=s400') || '';
 
       return {
         id: file.id!,
