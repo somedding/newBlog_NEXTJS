@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Masonry from 'react-masonry-css';
-import { FaImages, FaUpload, FaChevronDown, FaCalendarAlt, FaExpand, FaCompress, FaSync } from 'react-icons/fa';
+import { FaImages, FaUpload, FaChevronDown, FaCalendarAlt, FaExpand, FaCompress } from 'react-icons/fa';
 
 interface Photo {
   id: string;
@@ -41,7 +41,6 @@ export default function GalleryPage() {
   const [exifData, setExifData] = useState<ExifData | null>(null);
   const [showDateGroups, setShowDateGroups] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const breakpointColumns = {
     default: 4,
@@ -211,48 +210,16 @@ export default function GalleryPage() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // 새로고침 함수 추가
-  const refreshGallery = async () => {
-    setIsRefreshing(true);
-    try {
-      const response = await fetch('/api/gallery/list', { 
-        cache: 'no-store'  // 캐시 무시하고 새로운 데이터 가져오기
-      });
-      if (!response.ok) {
-        throw new Error('Failed to refresh gallery');
-      }
-      const images = await response.json();
-      setPhotos(images);
-    } catch (error) {
-      console.error('Error refreshing gallery:', error);
-      alert('갤러리 새로고침에 실패했습니다.');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
   return (
     <div className="container px-4 py-8 mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <FaImages className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold text-base-content">갤러리</h1>
-            <h3 className="text-lg text-base-content/70">
-              {showAllPhotos ? '모든 이미지' : '직접 촬영한 이미지'}
-            </h3>
-          </div>
+      <div className="flex items-center gap-3 mb-8">
+        <FaImages className="w-8 h-8 text-primary" />
+        <div>
+          <h1 className="text-3xl font-bold text-base-content">갤러리</h1>
+          <h3 className="text-lg text-base-content/70">
+            {showAllPhotos ? '모든 이미지' : '직접 촬영한 이미지'}
+          </h3>
         </div>
-        
-        {/* 새로고침 버튼 추가 */}
-        <button
-          onClick={refreshGallery}
-          className={`btn btn-primary btn-sm gap-2 ${isRefreshing ? 'loading' : ''}`}
-          disabled={isRefreshing}
-        >
-          <FaSync className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {isRefreshing ? '새로고침 중...' : '새로고침'}
-        </button>
       </div>
       
       {isLoading ? (

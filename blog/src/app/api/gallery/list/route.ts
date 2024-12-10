@@ -63,4 +63,4 @@ export async function GET() {
   }
 } 
 
-export const revalidate = 3600; // 1시간 캐싱 
+export const revalidate = 900; // 15분 캐싱 
