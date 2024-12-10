@@ -223,8 +223,16 @@ export default function GalleryPage() {
       </div>
       
       {isLoading ? (
-        <div className="flex justify-center items-center min-h-[200px]">
-          <span className="loading loading-spinner loading-lg"></span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="card shadow-xl">
+              <div className="skeleton h-48 w-full"></div>
+              <div className="card-body p-4">
+                <div className="skeleton h-4 w-3/4"></div>
+                <div className="skeleton h-3 w-1/2"></div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="space-y-12">
