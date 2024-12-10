@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Masonry from 'react-masonry-css';
-import { FaImages, FaUpload, FaChevronDown, FaCalendarAlt } from 'react-icons/fa';
+import { FaImages, FaUpload, FaChevronDown, FaCalendarAlt, FaExpand, FaCompress } from 'react-icons/fa';
 
 interface Photo {
   id: string;
@@ -39,6 +39,7 @@ export default function GalleryPage() {
   const [expandedMonths, setExpandedMonths] = useState<string[]>(['current']);
   const [exifData, setExifData] = useState<ExifData | null>(null);
   const [showDateGroups, setShowDateGroups] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const breakpointColumns = {
     default: 4,
@@ -182,6 +183,32 @@ export default function GalleryPage() {
         : [...prev, month]
     );
   };
+
+  // 전체화면 토글 함수
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      // 전체화면으로 전환
+      const modalElement = document.querySelector('.modal-box');
+      if (modalElement) {
+        modalElement.requestFullscreen();
+        setIsFullscreen(true);
+      }
+    } else {
+      // 전체화면 해제
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  // 전체화면 변경 감지
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   return (
     <div className="container px-4 py-8 mx-auto">
@@ -363,80 +390,103 @@ export default function GalleryPage() {
       {/* 모달 */}
       {selectedPhoto && (
         <dialog className="modal modal-open">
-          <div className="modal-box max-w-5xl max-h-[90vh] overflow-auto">
-            <div className="relative w-full h-full flex items-center justify-center min-h-[200px]">
-              {isModalImageLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-base-100/50">
-                  <span className="loading loading-spinner loading-lg text-primary"></span>
-                </div>
-              )}
-              {modalImageUrl && (
-                <Image
-                  src={modalImageUrl}
-                  alt={selectedPhoto.title}
-                  width={1200}
-                  height={1200}
-                  className="object-contain max-h-[80vh] w-auto h-auto"
-                  quality={100}
-                />
-              )}
-            </div>
-            <div className="mt-4 space-y-4">
-              <h3 className="text-lg font-bold">{selectedPhoto.title}</h3>
-              
-              {/* EXIF 데이터 표시 */}
-              {exifData && (
-                <div className="grid grid-cols-2 gap-4 p-4 bg-base-200 rounded-lg text-sm">
-                  <div className="space-y-2">
-                    <p><span className="font-semibold">카메라:</span> {exifData.camera}</p>
-                    <p><span className="font-semibold">렌즈:</span> {exifData.lens}</p>
-                    <p><span className="font-semibold">초점거리:</span> {exifData.focalLength}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p><span className="font-semibold">조리개:</span> {exifData.aperture}</p>
-                    <p><span className="font-semibold">셔터스피드:</span> {exifData.shutterSpeed}</p>
-                    <p><span className="font-semibold">ISO:</span> {exifData.iso}</p>
-                  </div>
-                  <div className="col-span-2">
-                    <p><span className="font-semibold">촬영일시:</span> {exifData.takenAt}</p>
-                  </div>
-                </div>
-              )}
+          <div className={`modal-box max-w-5xl max-h-[90vh] overflow-auto ${isFullscreen ? 'fixed inset-0 w-full h-full max-w-none max-h-none rounded-none' : ''}`}>
+            <div className="relative w-full h-full flex flex-col">
+              {/* 상단 버튼 영역 */}
+              <div className="absolute top-2 right-2 flex gap-2 z-10">
+                <button
+                  onClick={toggleFullscreen}
+                  className="btn btn-circle btn-ghost"
+                  title={isFullscreen ? '전체화면 나가기' : '전체화면으로 보기'}
+                >
+                  {isFullscreen ? (
+                    <FaCompress className="w-5 h-5" />
+                  ) : (
+                    <FaExpand className="w-5 h-5" />
+                  )}
+                </button>
+                <button 
+                  className="btn btn-circle btn-ghost" 
+                  onClick={() => {
+                    if (isFullscreen) {
+                      document.exitFullscreen();
+                    }
+                    setSelectedPhoto(null);
+                    setModalImageUrl(null);
+                    setIsModalImageLoading(false);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
 
-              {/* 기존 태그와 설명 표시 유지 */}
-              {selectedPhoto.description && (
-                <p className="text-base-content/80">{selectedPhoto.description}</p>
-              )}
-              {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedPhoto.tags.map((tag, index) => (
-                    <span key={index} className="badge badge-primary">{tag}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="modal-action">
-              <button 
-                className="btn" 
-                onClick={() => {
-                  setSelectedPhoto(null);
-                  setModalImageUrl(null);
-                  setIsModalImageLoading(false);
-                }}
-              >
-                닫기
-              </button>
+              {/* 이미지 영역 */}
+              <div className="relative w-full flex-1 flex items-center justify-center min-h-[200px]">
+                {isModalImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-base-100/50">
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
+                  </div>
+                )}
+                {modalImageUrl && (
+                  <Image
+                    src={modalImageUrl}
+                    alt={selectedPhoto.title}
+                    width={1200}
+                    height={1200}
+                    className={`object-contain w-auto h-auto ${isFullscreen ? 'max-h-screen' : 'max-h-[80vh]'}`}
+                    quality={100}
+                  />
+                )}
+              </div>
+
+              {/* 메타데이터 영역 */}
+              <div className={`mt-4 space-y-4 ${isFullscreen ? 'bg-base-100/80 p-4 rounded-lg backdrop-blur' : ''}`}>
+                <h3 className="text-lg font-bold">{selectedPhoto.title}</h3>
+                
+                {/* EXIF 데이터 표시 */}
+                {exifData && (
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-base-200 rounded-lg text-sm">
+                    <div className="space-y-2">
+                      <p><span className="font-semibold">카메라:</span> {exifData.camera}</p>
+                      <p><span className="font-semibold">렌즈:</span> {exifData.lens}</p>
+                      <p><span className="font-semibold">초점거리:</span> {exifData.focalLength}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p><span className="font-semibold">조리개:</span> {exifData.aperture}</p>
+                      <p><span className="font-semibold">셔터스피드:</span> {exifData.shutterSpeed}</p>
+                      <p><span className="font-semibold">ISO:</span> {exifData.iso}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p><span className="font-semibold">촬영일시:</span> {exifData.takenAt}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* 기존 태그와 설명 표시 유지 */}
+                {selectedPhoto.description && (
+                  <p className="text-base-content/80">{selectedPhoto.description}</p>
+                )}
+                {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPhoto.tags.map((tag, index) => (
+                      <span key={index} className="badge badge-primary">{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <form method="dialog" className="modal-backdrop">
-            <button onClick={() => {
-              setSelectedPhoto(null);
-              setModalImageUrl(null);
-              setIsModalImageLoading(false);
-            }}>
-              닫기
-            </button>
-          </form>
+          {!isFullscreen && (
+            <form method="dialog" className="modal-backdrop">
+              <button onClick={() => {
+                setSelectedPhoto(null);
+                setModalImageUrl(null);
+                setIsModalImageLoading(false);
+              }}>
+                닫기
+              </button>
+            </form>
+          )}
         </dialog>
       )}
     </div>
