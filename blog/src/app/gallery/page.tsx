@@ -78,14 +78,17 @@ export default function GalleryPage() {
     setExifData(null);
 
     try {
-      const imageResponse = await fetch(`/api/gallery/${photo.id}`);
+      const [imageResponse, metadataResponse] = await Promise.all([
+        fetch(`/api/gallery/${photo.id}`),
+        fetch(`/api/gallery/${photo.id}/metadata`)
+      ]);
+
       if (!imageResponse.ok) throw new Error('Failed to load image');
       
       const imageBlob = await imageResponse.blob();
       const imageUrl = URL.createObjectURL(imageBlob);
       setModalImageUrl(imageUrl);
 
-      const metadataResponse = await fetch(`/api/gallery/${photo.id}/metadata`);
       if (metadataResponse.ok) {
         const metadata = await metadataResponse.json();
         setExifData(metadata);
@@ -443,7 +446,8 @@ export default function GalleryPage() {
                       width={1200}
                       height={1200}
                       className="object-contain w-auto h-auto max-h-[100vh]"
-                      quality={100}
+                      quality={85}
+                      priority
                       style={{ margin: 'auto' }}
                     />
                   </div>
