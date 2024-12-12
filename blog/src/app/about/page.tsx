@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaGithub, FaEnvelope, FaInstagram, FaDiscord, FaLinkedin, FaBriefcase, FaCode, FaHeart, FaLanguage, FaLaptopCode, FaCamera, FaGlassMartini, FaRobot, FaBrain, FaTrophy } from 'react-icons/fa';
+import { FaGithub, FaEnvelope, FaInstagram, FaDiscord, FaLinkedin, FaBriefcase, FaCode, FaHeart, FaLanguage, FaLaptopCode, FaCamera, FaGlassMartini, FaRobot, FaBrain, FaTrophy, FaRust } from 'react-icons/fa';
 import Image from 'next/image';
 import { 
   SiJavascript, 
@@ -125,7 +125,18 @@ const projects = [
       { name: 'Chrome Extension', icon: TbBrandChrome, color: '#4285F4' },
     ],
     link: "https://github.com/somedding/TwoS"
-  }
+  },
+  {
+    title: "PIC Simple Selector",
+    icon: FaCode,
+    period: "2024.12.07 - 현재",
+    role: "개인 사이드프로젝트",
+    description: "사진 셀렉을 위한 GUI 프로그램, 업데이트중",
+    skills: [
+      { name: 'Rust', icon: FaRust, color: '#000000' },
+    ],
+    link: "https://github.com/somedding/PIC_Simple_Selector"
+  } //PIC_Simple_Selector
 ];
 
 const hobbies = [
