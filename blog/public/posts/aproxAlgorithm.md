@@ -66,7 +66,7 @@ for i in range(len(visit_seq)):
     if not mark[visit_seq[i]]: # 방문 안한 점(False)이면
         direct_seq.append(visit_seq[i])
         j += 1
-        mark[visit_seq[i]] = True # 방문한 점(True로 변경)
+        mark[visit_seq[i]] = True # 방문한 점(True로 변경)4
 direct_seq.append(0)  # 도착점 = 시작점
 print('- TSP 방문 순서(중복제거) :', direct_seq)
 
@@ -78,3 +78,70 @@ print('- TSP 최종 경로의 길이  = ', total)
 
 
 ```
+
+
+## 통채우기 문제
+1. 최초 적합 First Fit
+2. 다음 적합 
+3. 최적 적합
+4. 최악 적합
+최초 , 최선 , 최악 적합은 최소한의 통을 쓰는 거임
+다음 적합은 최소한의 통을 쓰지는 않음
+
+### 최초 적합 First Fit
+//todo
+
+### JobScheduling
+```python title="의사코드"
+for j = 1 to m
+    L[j] = 0
+for i = 1 to n
+    min = 1
+    for j = 2 to m
+        if L[j] < L[min]
+            min = j #작업 i를 기계 M[min]에 배정
+    L[min] = L[min] + t[i]
+return L #가장 늦은 작업 종료 시간 (모든 작업이 종료된 시간)
+```
+
+```python title="JobScheduling.py"
+# 작업 스케쥴링 알고리즘
+def JobScheduling(Job):
+    M = [[0]]  # 기계 0으로 시작, 시작시간=0
+    for i in range(len(Job)):
+        j = 0   # 현재 기계의 인덱스
+        allocated = False # 현재 작업에 대한 할당완료 여부
+        while not allocated and j < len(M): # 현재 확인할 기계가 존재
+            if Job[i][0] >= M[j][0]: # 현재 기계에 현재 작업을 할당할 수 있는지 확인
+                M[j].append(i)       # 기계 j에 Job i 할당
+                M[j][0] = Job[i][1]  # 기계 j의 시작(가능한)시간을 job i의 종료시간으로
+                allocated = True     # 현재 작업에 대한 할당 완료    
+            j += 1                   # 다음 기계로 넘어가기 위해 인덱스 증가
+        if not allocated:        # 현재 작업에 대한 할당이 완료되지 않았으면
+            M.append([0])       # 새로운 기계 추가: 0은 해당 기계의 시작 가능 시간
+            M[j].append(i)      # 새로운 기계 j에 현재 작업을 할당
+            M[j][0] = job[i][1] # 기계 j의 시작(가능한)시간을 job i의 종료시간으로               
+            
+    last_job = max(Job, key=lambda arr: arr[1])  # 모든 작업의 최종 종료시간
+    print('[모든 작업의 종료시간] = %d' % last_job[1])
+    return M
+
+# 입력 : n개의 작업, 시작시간으로 정렬
+job = [[0,2],[1,6],[1,5],[3,7],[5,9],[6,8],[7,8]]  # [시작시간,종료시간]
+machine = JobScheduling(job)    # 작업 스케쥴링 알고리즘 호출
+
+for k in range(len(machine)):   # 기계에 배정된 job 리스트 출력
+    print('기계%d:'% k, end='')
+    for i in range(1, len(machine[k])): 
+        print(' 작업%d' % machine[k][i],job[machine[k][i]],'',end='')
+    print()
+
+```
+
+### 클러스터링 문제
+#### 클러스터링 알고리즘 방법
+1. C1을 찾을때는 임의
+2. 두번쨰 센터 C2는 가장 먼점을 할당하되 , 두개의 그룹으로 나누어 생각하면 편하다.
+3. 세번째 센터 C3는 가장 먼점을 할당하는데 후보지에서 그중 작은 값을 D[i]로 설정, D에서 가장 큰 값을 가진 원소의 인덱스가 i라고 하면 점 $x_i$가 C3가 된다.
+
+#### D[i] 계산

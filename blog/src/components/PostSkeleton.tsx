@@ -17,5 +17,5 @@ export default function PostSkeleton() {
         </div>
       </div>
     </div>
-  );
+);
 } 
