@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Masonry from 'react-masonry-css';
-import { FaImages, FaUpload, FaChevronDown, FaCalendarAlt, FaExpand, FaCompress } from 'react-icons/fa';
+import { FaExpand, FaCompress } from 'react-icons/fa';
 
 interface Photo {
   id: string;
@@ -12,8 +12,8 @@ interface Photo {
   thumbnailUrl: string;
   fullUrl: string;
   createdTime: string;
-  description?: string;
-  tags?: string[];
+  description: string;
+  tags: string[];
   uploadedAt: string;
   modifiedTime: string;
   takenAt: string;
@@ -30,47 +30,105 @@ interface ExifData {
   location: string;
 }
 
+const PHOTOS_PER_PAGE = 20;  // 한 번에 로드할 사진 수
+
 export default function GalleryPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [isModalImageLoading, setIsModalImageLoading] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
-  const [showAllPhotos, setShowAllPhotos] = useState(false);
-  const [expandedMonths, setExpandedMonths] = useState<string[]>(['current']);
+  const [isModalImageLoading, setIsModalImageLoading] = useState(false);
   const [exifData, setExifData] = useState<ExifData | null>(null);
-  const [showDateGroups, setShowDateGroups] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [pageToken, setPageToken] = useState<string | null>(null);  // pageToken 추가
+  
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const breakpointColumns = {
     default: 4,
     1536: 3,
     1024: 2,
-    640: 1
+    640: 1,
   };
 
-  useEffect(() => {
-    async function loadImages() {
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/gallery/list');
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.details || 'Failed to fetch images');
-        }
-        const images = await response.json();
-        setPhotos(images);
-      } catch (error) {
-        console.error('Error loading images:', error);
-        alert('이미지를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.');
-      } finally {
-        setIsLoading(false);
+  const loadPhotos = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/gallery/list?${pageToken ? `pageToken=${pageToken}` : ''}&limit=${PHOTOS_PER_PAGE}`);
+      const data = await response.json();
+      
+      if (!data || !data.images) {
+        console.error('Invalid response format:', data);
+        setHasMore(false);
+        return;
       }
+
+      const newPhotos: Photo[] = data.images.map((photo: any) => ({
+        id: photo.id,
+        src: photo.src,
+        title: photo.title,
+        thumbnailUrl: photo.thumbnailUrl,
+        fullUrl: photo.fullUrl,
+        createdTime: photo.createdTime,
+        description: photo.description,
+        tags: photo.tags,
+        uploadedAt: photo.uploadedAt,
+        modifiedTime: photo.modifiedTime,
+        takenAt: photo.takenAt
+      }));
+      
+      if (!data.nextPageToken) {
+        setHasMore(false);
+      } else {
+        setPageToken(data.nextPageToken);
+      }
+      
+      setPhotos(prev => [...prev, ...newPhotos]);
+    } catch (error) {
+      console.error('Error loading photos:', error);
+      setHasMore(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [hasMore, isLoading, pageToken]);
+
+  // Intersection Observer 설정
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore && !isLoading) {
+          loadPhotos();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '100px',  // 하단에서 100px 전에 로딩 시작
+        threshold: 0.1
+      }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
     }
 
-    loadImages();
-  }, []);
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, isLoading, loadPhotos]);
 
+  // 초기 로딩
+  useEffect(() => {
+    loadPhotos();
+  }, [loadPhotos]);
+
+  // 사진 클릭 핸들러
   const handlePhotoClick = async (photo: Photo) => {
     setSelectedPhoto(photo);
     setIsModalImageLoading(true);
@@ -95,103 +153,14 @@ export default function GalleryPage() {
       }
     } catch (error) {
       console.error('Error loading image or metadata:', error);
-      alert('이미지를 불러오는데 실패했습니다.');
     } finally {
       setIsModalImageLoading(false);
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (modalImageUrl) {
-        URL.revokeObjectURL(modalImageUrl);
-      }
-    };
-  }, [modalImageUrl]);
-
-  // 사진들을 날짜별로 그룹화하는 함수
-  const groupPhotosByDate = (photos: Photo[]) => {
-    const groups = photos.reduce((acc, photo) => {
-      const date = new Date(photo.takenAt);
-      const dateKey = new Intl.DateTimeFormat('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }).format(date);
-
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(photo);
-      return acc;
-    }, {} as Record<string, Photo[]>);
-
-    // 날짜순으로 정렬
-    return Object.entries(groups).sort((a, b) => {
-      const dateA = new Date(a[1][0].takenAt);
-      const dateB = new Date(b[1][0].takenAt);
-      return dateB.getTime() - dateA.getTime();
-    });
-  };
-
-  // 한달 이내의 사진만 필터링하는 함수
-  const filterRecentPhotos = (photos: Photo[]) => {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    
-    return photos.filter(photo => 
-      new Date(photo.takenAt) > oneMonthAgo
-    );
-  };
-
-  // 사진들을 월별로 그룹화하는 함수
-  const groupPhotosByMonth = (photos: Photo[]) => {
-    const groups = photos.reduce((acc, photo) => {
-      const date = new Date(photo.takenAt);
-      const monthKey = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-      
-      if (!acc[monthKey]) {
-        acc[monthKey] = [];
-      }
-      acc[monthKey].push(photo);
-      return acc;
-    }, {} as Record<string, Photo[]>);
-
-    // 월별로 정렬
-    return Object.entries(groups).sort((a, b) => {
-      const dateA = new Date(a[0].replace(/년 /, '-').replace(/월/, ''));
-      const dateB = new Date(b[0].replace(/년 /, '-').replace(/월/, ''));
-      return dateB.getTime() - dateA.getTime();
-    });
-  };
-
-  // 표시할 사진 결정
-  const displayedPhotos = useMemo(() => {
-    const recentPhotos = filterRecentPhotos(photos);
-    const olderPhotos = photos.filter(photo => 
-      new Date(photo.takenAt) <= new Date(new Date().setMonth(new Date().getMonth() - 1))
-    );
-
-    const groupedOlderPhotos = groupPhotosByMonth(olderPhotos);
-    
-    return {
-      recent: recentPhotos,
-      older: groupedOlderPhotos
-    };
-  }, [photos]);
-
-  const toggleMonth = (month: string) => {
-    setExpandedMonths(prev => 
-      prev.includes(month)
-        ? prev.filter(m => m !== month)
-        : [...prev, month]
-    );
-  };
-
-  // 전체화면 토글 함수
+  // 전체화면 토글
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      // 이미지 요소만 전체화면으로 전환
       const imageElement = document.querySelector('.modal-image');
       if (imageElement) {
         imageElement.requestFullscreen();
@@ -203,200 +172,49 @@ export default function GalleryPage() {
     }
   };
 
-  // 전체화면 변경 감지
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
   return (
     <div className="container px-4 py-8 mx-auto">
-      <div className="flex items-center gap-3 mb-8">
-        <FaImages className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold text-base-content">갤러리</h1>
-          <h3 className="text-lg text-base-content/70">
-            {showAllPhotos ? '모든 이미지' : '직접 촬영한 이미지'}
-          </h3>
-        </div>
+      <h1 className="text-3xl font-bold mb-8 text-base-content">갤러리</h1>
+
+      {/* 갤러리 그리드 */}
+      <Masonry
+        breakpointCols={breakpointColumns}
+        className="my-masonry-grid"
+        columnClassName="my-masonry-grid_column"
+      >
+        {photos.map((photo) => (
+          <div 
+            key={photo.id} 
+            className="mb-4 overflow-hidden transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl cursor-pointer"
+            onClick={() => handlePhotoClick(photo)}
+          >
+            <div className="relative aspect-auto max-h-[600px] group">
+              <Image
+                src={photo.thumbnailUrl}
+                alt={photo.title}
+                width={600}
+                height={600}
+                className="transition-transform duration-300 group-hover:scale-105 object-contain w-full h-full"
+                quality={85}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLzYxMC8vMTQ3PEFGODlLPTQ5RWFJTlNTVW9qanFXYWNqa2T/2wBDARUXFx4aHR4eHWRQOEBkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGT/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+              />
+              <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-black/50 group-hover:opacity-100">
+                <div className="flex flex-col items-center justify-center w-full h-full p-4">
+                  <p className="text-lg font-semibold text-white mb-2">
+                    {photo.title}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </Masonry>
+
+      {/* 로딩 인디케이터 & 관찰 대상 */}
+      <div ref={observerTarget} className="h-10 flex items-center justify-center mt-4">
+        {isLoading && <span className="loading loading-spinner loading-md"></span>}
       </div>
-      
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="card shadow-xl">
-              <div className="skeleton h-48 w-full"></div>
-              <div className="card-body p-4">
-                <div className="skeleton h-4 w-3/4"></div>
-                <div className="skeleton h-3 w-1/2"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-12">
-          {/* 최근 한달 사진 */}
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-base-content">최근 한달</h2>
-              <button
-                onClick={() => setShowDateGroups(!showDateGroups)}
-                className="btn btn-sm btn-outline gap-2"
-              >
-                <FaCalendarAlt className="w-4 h-4" />
-                {showDateGroups ? '날짜별 보기 해제' : '날짜별 보기'}
-              </button>
-            </div>
-
-            {showDateGroups ? (
-              // 날짜별로 그룹화된 보기
-              <div className="space-y-8">
-                {groupPhotosByDate(displayedPhotos.recent).map(([date, datePhotos]) => (
-                  <div key={date} className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <h2 className="text-xl font-semibold text-primary">{date}</h2>
-                      <div className="flex-1 border-b border-base-content/20"></div>
-                    </div>
-                    
-                    <Masonry
-                      breakpointCols={breakpointColumns}
-                      className="my-masonry-grid"
-                      columnClassName="my-masonry-grid_column"
-                    >
-                      {datePhotos.map((photo) => (
-                        <div 
-                          key={photo.id} 
-                          className="mb-4 overflow-hidden transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl cursor-pointer"
-                          onClick={() => handlePhotoClick(photo)}
-                        >
-                          <div className="relative aspect-auto max-h-[600px] group">
-                            <Image
-                              src={photo.thumbnailUrl}
-                              alt={photo.title}
-                              width={200}
-                              height={200}
-                              loading="lazy"
-                              className="transition-transform duration-300 group-hover:scale-105 object-contain w-full h-full"
-                              quality={75}
-                              placeholder="blur"
-                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLzYxMC8vMTQ3PEFGODlLPTQ5RWFJTlNTVW9qanFXYWNqa2T/2wBDARUXFx4aHR4eHWRQOEBkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGT/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                            />
-                            <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-black/50 group-hover:opacity-100">
-                              <div className="flex flex-col items-center justify-center w-full h-full p-4">
-                                <p className="text-lg font-semibold text-white mb-2">
-                                  {photo.title}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </Masonry>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              // 날짜 구분 없는 기본 보기
-              <Masonry
-                breakpointCols={breakpointColumns}
-                className="my-masonry-grid"
-                columnClassName="my-masonry-grid_column"
-              >
-                {displayedPhotos.recent.map((photo) => (
-                  <div 
-                    key={photo.id} 
-                    className="mb-4 overflow-hidden transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl cursor-pointer"
-                    onClick={() => handlePhotoClick(photo)}
-                  >
-                    <div className="relative aspect-auto max-h-[600px] group">
-                      <Image
-                        src={photo.thumbnailUrl}
-                        alt={photo.title}
-                        width={200}
-                        height={200}
-                        loading="lazy"
-                        className="transition-transform duration-300 group-hover:scale-105 object-contain w-full h-full"
-                        quality={75}
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLzYxMC8vMTQ3PEFGODlLPTQ5RWFJTlNTVW9qanFXYWNqa2T/2wBDARUXFx4aHR4eHWRQOEBkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGT/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                      />
-                      <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-black/50 group-hover:opacity-100">
-                        <div className="flex flex-col items-center justify-center w-full h-full p-4">
-                          <p className="text-lg font-semibold text-white mb-2">
-                            {photo.title}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </Masonry>
-            )}
-          </div>
-
-          {/* 이전 사진들 (월별) */}
-          <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-base-content">이전 사진</h2>
-            {displayedPhotos.older.map(([month, monthPhotos]) => (
-              <div key={month} className="space-y-4">
-                <button
-                  onClick={() => toggleMonth(month)}
-                  className="flex items-center gap-4 w-full"
-                >
-                  <h3 className="text-xl font-semibold text-primary">{month}</h3>
-                  <div className="flex-1 border-b border-base-content/20"></div>
-                  <FaChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      expandedMonths.includes(month) ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                
-                {expandedMonths.includes(month) && (
-                  <Masonry
-                    breakpointCols={breakpointColumns}
-                    className="my-masonry-grid"
-                    columnClassName="my-masonry-grid_column"
-                  >
-                    {monthPhotos.map((photo) => (
-                      <div 
-                        key={photo.id} 
-                        className="mb-4 overflow-hidden transition-all duration-300 rounded-lg shadow-lg hover:shadow-xl cursor-pointer"
-                        onClick={() => handlePhotoClick(photo)}
-                      >
-                        <div className="relative aspect-auto max-h-[600px] group">
-                          <Image
-                            src={photo.thumbnailUrl}
-                            alt={photo.title}
-                            width={200}
-                            height={200}
-                            loading="lazy"
-                            className="transition-transform duration-300 group-hover:scale-105 object-contain w-full h-full"
-                            quality={75}
-                            placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkLzYxMC8vMTQ3PEFGODlLPTQ5RWFJTlNTVW9qanFXYWNqa2T/2wBDARUXFx4aHR4eHWRQOEBkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGT/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                          />
-                          <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-black/50 group-hover:opacity-100">
-                            <div className="flex flex-col items-center justify-center w-full h-full p-4">
-                              <p className="text-lg font-semibold text-white mb-2">
-                                {photo.title}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </Masonry>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* 모달 */}
       {selectedPhoto && (
@@ -435,7 +253,7 @@ export default function GalleryPage() {
               <div className="relative w-full flex-1 flex items-center justify-center min-h-[200px]">
                 {isModalImageLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-base-100/50">
-                    <span className="loading loading-dots loading-lg text-primary"></span>
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
                   </div>
                 )}
                 {modalImageUrl && (
@@ -454,53 +272,38 @@ export default function GalleryPage() {
                 )}
               </div>
 
-              {/* 메타데이터 영역 */}
-              <div className="mt-4 space-y-4">
-                <h3 className="text-lg font-bold">{selectedPhoto.title}</h3>
-                
-                {/* EXIF 데이터 표시 */}
-                {exifData && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-base-200 rounded-lg text-sm">
-                    <div className="space-y-2">
-                      <p><span className="font-semibold">카메라:</span> {exifData.camera}</p>
-                      <p><span className="font-semibold">렌즈:</span> {exifData.lens}</p>
-                      <p><span className="font-semibold">초점거리:</span> {exifData.focalLength}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p><span className="font-semibold">조리개:</span> {exifData.aperture}</p>
-                      <p><span className="font-semibold">셔터스피드:</span> {exifData.shutterSpeed}</p>
-                      <p><span className="font-semibold">ISO:</span> {exifData.iso}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p><span className="font-semibold">촬영일시:</span> {exifData.takenAt}</p>
-                      <p><span className="font-semibold">촬영장소:</span> {exifData.location}</p>
-                    </div>
+              {/* EXIF 데이터 표시 */}
+              {exifData && (
+                <div className="grid grid-cols-2 gap-4 p-4 bg-base-200 rounded-lg text-sm mt-4">
+                  <div className="space-y-2">
+                    <p><span className="font-semibold">카메라:</span> {exifData.camera}</p>
+                    <p><span className="font-semibold">렌즈:</span> {exifData.lens}</p>
+                    <p><span className="font-semibold">초점거리:</span> {exifData.focalLength}</p>
                   </div>
-                )}
-
-                {/* 기존 태그와 설명 표시 유지 */}
-                {selectedPhoto.description && (
-                  <p className="text-base-content/80">{selectedPhoto.description}</p>
-                )}
-                {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPhoto.tags.map((tag, index) => (
-                      <span key={index} className="badge badge-primary">{tag}</span>
-                    ))}
+                  <div className="space-y-2">
+                    <p><span className="font-semibold">조리개:</span> {exifData.aperture}</p>
+                    <p><span className="font-semibold">셔터스피드:</span> {exifData.shutterSpeed}</p>
+                    <p><span className="font-semibold">ISO:</span> {exifData.iso}</p>
                   </div>
-                )}
-              </div>
+                  <div className="col-span-2">
+                    <p><span className="font-semibold">촬영일시:</span> {exifData.takenAt}</p>
+                    <p><span className="font-semibold">촬영장소:</span> {exifData.location}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <form method="dialog" className="modal-backdrop">
-            <button onClick={() => {
-              setSelectedPhoto(null);
-              setModalImageUrl(null);
-              setIsModalImageLoading(false);
-            }}>
-              닫기
-            </button>
-          </form>
+          {!isFullscreen && (
+            <form method="dialog" className="modal-backdrop">
+              <button onClick={() => {
+                setSelectedPhoto(null);
+                setModalImageUrl(null);
+                setIsModalImageLoading(false);
+              }}>
+                닫기
+              </button>
+            </form>
+          )}
         </dialog>
       )}
     </div>
