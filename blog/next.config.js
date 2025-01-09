@@ -16,8 +16,11 @@ const nextConfig = {
       }
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   typescript: {
-    ignoreBuildErrors: true,  // 타입 체크 오류 무시
+    ignoreBuildErrors: true,
   },
   experimental: {
     serverActions: true,

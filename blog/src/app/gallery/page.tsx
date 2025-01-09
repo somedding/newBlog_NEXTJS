@@ -30,6 +30,20 @@ interface ExifData {
   location: string;
 }
 
+interface APIResponse {
+  id: string;
+  src: string;
+  title: string;
+  thumbnailUrl: string;
+  fullUrl: string;
+  createdTime: string;
+  description: string;
+  tags: string[];
+  uploadedAt: string;
+  modifiedTime: string;
+  takenAt: string;
+}
+
 const PHOTOS_PER_PAGE = 20;  // 한 번에 로드할 사진 수
 
 export default function GalleryPage() {
@@ -67,7 +81,7 @@ export default function GalleryPage() {
         return;
       }
 
-      const newPhotos: Photo[] = data.images.map((photo: any) => ({
+      const newPhotos: Photo[] = data.images.map((photo: APIResponse) => ({
         id: photo.id,
         src: photo.src,
         title: photo.title,
@@ -100,25 +114,27 @@ export default function GalleryPage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasMore && !isLoading) {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
           loadPhotos();
         }
       },
       {
         root: null,
-        rootMargin: '100px',  // 하단에서 100px 전에 로딩 시작
+        rootMargin: '100px',
         threshold: 0.1
       }
     );
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+    // ref 값을 변수에 저장하여 cleanup에서 사용
+    const currentObserverTarget = observerTarget.current;
+
+    if (currentObserverTarget) {
+      observer.observe(currentObserverTarget);
     }
 
     return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
+      if (currentObserverTarget) {
+        observer.unobserve(currentObserverTarget);
       }
     };
   }, [hasMore, isLoading, loadPhotos]);
